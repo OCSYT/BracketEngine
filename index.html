@@ -33,19 +33,21 @@
         {
           "imports": {
             "three": "./node_modules/three/build/three.module.js",
-            "OBJLoader": "./node_modules/three/examples/jsm/loaders/OBJLoader.js"
+            "OBJLoader": "./node_modules/three/examples/jsm/loaders/OBJLoader.js",
+            "CANNON": "./node_modules/cannon-es/dist/cannon-es.js"
           }
         }
       </script>
     <script type="module">
         import { Engine } from "./engine.js";
         import { Program } from "./program.js";
-        
+
         const program = new Program();
         document.title = program.applicationName;
         program.engine = new Engine();
         program.engine.start();
         program.start();
+
         
         let lastFrameTime = performance.now();
         

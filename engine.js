@@ -1,5 +1,8 @@
 import * as THREE from './node_modules/three/build/three.module.js';
 import { OBJLoader } from './node_modules/three/examples/jsm/loaders/OBJLoader.js';
+import * as CANNON from './node_modules/cannon-es/dist/cannon-es.js';
+
+
 
 export class Engine {
     constructor() {
@@ -9,6 +12,11 @@ export class Engine {
         this.gameObjects = [];
         this.isRunning = false;
         this.lastFrameTime = performance.now();
+        this.physicsWorld = new CANNON.World({
+            gravity: new CANNON.Vec3(0,  -9.82,0) // m/s²
+        });
+
+
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(this.renderer.domElement);
     }
@@ -27,11 +35,16 @@ export class Engine {
         const currentTime = performance.now();
         const deltaTime = (currentTime - this.lastFrameTime) / 1000;
         this.lastFrameTime = currentTime;
-        
+
+        if (this.physicsWorld == null) return;
+
+        this.physicsWorld.fixedStep();
+
         // Update game logic here
         this.gameObjects.forEach(gameObject => {
             gameObject.update(deltaTime);
         });
+
 
         this.renderScene();
         requestAnimationFrame(() => this.update());
@@ -77,7 +90,7 @@ export class Engine {
         });
     }
 
-    async loadShader(url){
+    async loadShader(url) {
         let shader = await (await fetch(url)).text();
         return shader;
     }
@@ -121,18 +134,48 @@ export class GameObject {
         this.rotation = { x: 0, y: 0, z: 0 };
         this.scale = { x: 1, y: 1, z: 1 };
         this.components = [];
+        this.physicsBody = null;
+    }
+
+    initPhysicsBody(physicsWorld, shape, mass = 0) {
+        const { x, y, z } = this.position;
+        const { x: sx, y: sy, z: sz } = this.scale;
+
+        const body = new CANNON.Body({
+            mass: mass,
+            position: new CANNON.Vec3(x, y, z),
+            shape: shape
+        });
+
+
+        this.physicsBody = body;
+
+        physicsWorld.addBody(body);
     }
 
     setPosition(x, y, z) {
-        this.position = { x, y, z };
+        this.position.x = x;
+        this.position.y = y;
+        this.position.z = z;
     }
 
     setRotation(x, y, z) {
-        this.rotation = { x, y, z };
+        this.rotation.x = x;
+        this.rotation.y = y;
+        this.rotation.z = z;
     }
 
     setScale(x, y, z) {
-        this.scale = { x, y, z };
+        this.scale.x = x;
+        this.scale.y = y;
+        this.scale.z = z;
+    }
+
+    updatePhysics(deltaTime) {
+        if (this.physicsBody) {
+            this.position = this.physicsBody.position.clone();
+            this.rotation = this.physicsBody.quaternion.clone();
+        }
     }
 
     update(deltaTime) {
@@ -141,22 +184,15 @@ export class GameObject {
                 component.update(deltaTime);
             }
         });
+        this.updatePhysics(deltaTime);
     }
 
     addToScene(scene) {
-
         this.components.forEach(component => {
             component.gameObject = this;
-        });
-
-        this.components.forEach(component => {
             if (component.addToScene) {
                 component.addToScene(scene);
             }
-        });
-
-        //start function for simplicity
-        this.components.forEach(component => {
             if (component.start) {
                 component.start();
             }
@@ -181,10 +217,12 @@ export class GameObject {
             this.components.splice(index, 1);
         }
     }
+
     getComponent(type) {
         return this.components.find(component => component instanceof type);
     }
 }
+
 
 export class MeshComponent {
     constructor(geometry, materials, castShadows, recieveShadows) {
