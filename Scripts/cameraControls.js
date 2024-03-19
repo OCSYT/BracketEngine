@@ -44,14 +44,13 @@ export class CameraControls {
     onMouseMove(event) {
 
 
-        this.mouseStopped = false; // Mouse is moving
+        this.mouseStopped = false;
         this.mouseX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
         this.mouseY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
-        // Reset timer for detecting mouse stoppage
         clearTimeout(this.timer);
         this.timer = setTimeout(() => {
-            this.mouseStopped = true; // Mouse stopped moving
-        }, 50); // Adjust the timeout value as needed
+            this.mouseStopped = true;
+        }, 10);
     }
 
     onKeyDown(event) {
@@ -101,31 +100,28 @@ export class CameraControls {
     }
 
     update(deltaTime) {
-        console.log(this.moveDown, this.moveUp);
-        const sensitivity = 1 * deltaTime; // adjust this to control rotation sensitivity
-        const deltaX = (this.mouseX) * sensitivity; // Calculate delta from previous position
+        const sensitivity = 1 * deltaTime;
+        const deltaX = (this.mouseX) * sensitivity;
         const deltaY = (this.mouseY) * sensitivity;
 
         // Update camera rotation based on mouse movement
         if (!this.mouseStopped) {
             this.rotY -= deltaX;
             this.rotX -= deltaY;
-            this.rotX = THREE.MathUtils.clamp(this.rotX, -90 * Math.PI /180, 90* Math.PI /180);
+            this.rotX = THREE.MathUtils.clamp(this.rotX, -90 * Math.PI / 180, 90 * Math.PI / 180);
             const euler = new THREE.Euler(this.rotX, this.rotY, 0, 'YXZ');
             this.camera.quaternion.setFromEuler(euler);
         }
 
         // Update camera position based on WASD movement
-        const moveSpeed = this.moveSpeed * deltaTime; // Adjust movement speed based on delta time
+        const moveSpeed = this.moveSpeed * deltaTime;
         const direction = new THREE.Vector3();
         direction.z = Number(this.moveBackward) - Number(this.moveForward);
         direction.x = Number(this.moveRight) - Number(this.moveLeft);
         direction.y = Number(this.moveUp) - Number(this.moveDown);
-        direction.normalize(); // Normalize the direction vector
+        direction.normalize();
 
-        if (direction.x || direction.y ||  direction.z) {
-            direction.multiplyScalar(moveSpeed);
-            this.camera.translateOnAxis(direction, 1);
-        }
+        direction.multiplyScalar(moveSpeed);
+        this.camera.translateOnAxis(direction, 1);
     }
 }
