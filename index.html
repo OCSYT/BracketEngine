@@ -18,6 +18,7 @@
             position: absolute;
             z-index: 999;
             user-select: none;  
+            font-family: Arial, Helvetica, sans-serif;
         }
         .selectable {
             user-select: all;
@@ -36,8 +37,6 @@
           }
         }
       </script>
-    <script src="./engine.js" type="module"></script>
-    <script src="./program.js" type="module"></script>
     <script type="module">
         import { Engine } from "./engine.js";
         import { Program } from "./program.js";
@@ -64,7 +63,7 @@
         async function appendUIContent() {
             try {
                 // Fetch the ui.html file
-                const response = await fetch('ui.html');
+                const response = await fetch('./UI/ui.html');
                 if (!response.ok) {
                     throw new Error('Failed to fetch UI content');
                 }
