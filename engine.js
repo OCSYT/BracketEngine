@@ -77,6 +77,11 @@ export class Engine {
         });
     }
 
+    async loadShader(url){
+        let shader = await (await fetch(url)).text();
+        return shader;
+    }
+
 
     // Function to load a texture
     async loadTexture(url) {
