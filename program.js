@@ -40,9 +40,9 @@ export class Program {
             './Textures/Skybox/Daylight Box_Top.bmp', './Textures/Skybox/Daylight Box_Bottom.bmp',
             './Textures/Skybox/Daylight Box_Front.bmp', './Textures/Skybox/Daylight Box_Back.bmp',
         ]);
+        this.engine.scene.background = textureCube;
 
         //camera
-        this.engine.scene.background = textureCube;
         this.engine.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         this.engine.camera.position.z = 5;
 
