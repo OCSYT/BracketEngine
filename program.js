@@ -61,7 +61,7 @@ export class Program {
         cubeObject.setPosition(0, 0, 0);
         cubeObject.addComponent(new MeshComponent(cubeGeometry, [cubeMaterial], true, true));
         this.engine.addGameObject(cubeObject);
-
+        
 
         const PlaneGeometry = await this.engine.loadMesh("./Models/Primitive/cube.obj");
         const PlaneMaterial = new THREE.MeshStandardMaterial();
