@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            color: white;
+        }
+
+        canvas {
+            display: block;
+        }
+        .ui-overlay {
+            position: absolute;
+            z-index: 999;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ui-overlay">
+    </div>
+    <script type="importmap">
+        {
+          "imports": {
+            "three": "./node_modules/three/build/three.module.js",
+            "OBJLoader": "./node_modules/three/examples/jsm/loaders/OBJLoader.js"
+          }
+        }
+      </script>
+    <script src="./engine.js" type="module"></script>
+    <script src="./program.js" type="module"></script>
+    <script type="module">
+        import { Engine } from "./engine.js";
+        import { Program } from "./program.js";
+        
+        const program = new Program();
+        document.title = program.applicationName;
+        program.engine = new Engine();
+        program.engine.start();
+        program.start();
+        
+        let lastFrameTime = performance.now();
+        
+        function update() {
+            const currentTime = performance.now();
+            const deltaTime = (currentTime - lastFrameTime) / 1000;
+            lastFrameTime = currentTime;
+            
+            program.update(deltaTime);
+            requestAnimationFrame(update);
+        }
+        
+        update();
+
+        async function appendUIContent() {
+            try {
+                // Fetch the ui.html file
+                const response = await fetch('ui.html');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch UI content');
+                }
+
+                // Get the HTML content from the response
+                const htmlContent = await response.text();
+
+                // Append the HTML content to the .ui-overlay div
+                const uiOverlay = document.querySelector('.ui-overlay');
+                uiOverlay.innerHTML = htmlContent;
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        appendUIContent();
+    </script>
+    
+    
+    
+</body>
+
+</html>
