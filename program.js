@@ -13,7 +13,7 @@ export class Program {
         this.setupLighting();
         this.setupScene();
 
-
+        //Cube
         const cubeGeometry = await this.engine.loadMesh("./Models/Primitive/cube.obj");
         const cubeMaterial = new THREE.MeshStandardMaterial();
         const cubeTex = await this.engine.loadTexture("./Textures/Required/None.png");
@@ -25,6 +25,7 @@ export class Program {
         cubeObject.addComponent(new MeshComponent(cubeGeometry, [cubeMaterial], true, true));
         this.engine.addGameObject(cubeObject);
 
+        //ground
         const planeGeometry = await this.engine.loadMesh("./Models/Primitive/cube.obj");
         const planeMaterial = new THREE.MeshStandardMaterial();
         const planeObject = new GameObject();
@@ -34,12 +35,12 @@ export class Program {
         planeObject.initPhysicsBody(this.engine.physicsWorld, planeShape, 0);
         planeObject.addComponent(new MeshComponent(planeGeometry, [planeMaterial], true, true));
         this.engine.addGameObject(planeObject);
-
+        
 
         //camera
         this.engine.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         this.engine.camera.position.z = 5;
-        
+
         const cameraControls = new CameraControls(this.engine.camera);
         const CameraObj = new GameObject();
         CameraObj.addComponent(cameraControls);
