@@ -3,6 +3,9 @@ import * as THREE from 'three';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import * as CANNON from './node_modules/cannon-es/dist/cannon-es.js';
 import { CSM } from 'three/addons/csm/CSM.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 
 import { PlayerControls } from './Scripts/playerControls.js';
 
@@ -11,38 +14,27 @@ export class Program {
         this.applicationName = "BracketEngine Sample Scene";
     }
 
-    async start() {
-
-        //camera
-        this.engine.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.5, 1000);
-        const CameraObj = new GameObject();
-        this.engine.addGameObject(CameraObj);
-
-
-        this.setupLighting();
-        this.setupScene();
-
-        //Cube
+    async AddCube(color, position, rotation, mass) {
         const cubeGeometry = await this.engine.loadMesh("./Models/Primitive/cube.obj");
         const cubeMaterial = new THREE.MeshStandardMaterial();
-        const cubeTex = await this.engine.loadTexture("./Textures/Required/None.png");
+        const cubeTex = await this.engine.loadTexture("./Textures/Required/Checkerboard.png");
         cubeMaterial.map = cubeTex;
+        cubeMaterial.color.set(color);
         const cubeObject = new GameObject();
-        cubeObject.setPosition(0, 5, 0);
-        cubeObject.setRotation(0,0,0);
+        cubeObject.setPosition(position.x, position.y, position.z);
+        cubeObject.setRotation(rotation.x,rotation.y,rotation.z);
         const cubeShape = new CANNON.Box(new CANNON.Vec3(1, 1, 1));
-        cubeObject.initPhysicsBody(this.engine.physicsWorld, cubeShape, 0.5, 1, 1);
+        cubeObject.initPhysicsBody(this.engine.physicsWorld, cubeShape, 0.5, 1, mass);
         this.engine.csm.setupMaterial(cubeMaterial);
         cubeObject.addComponent(new MeshComponent(cubeGeometry, [cubeMaterial], true, true));
         this.engine.addGameObject(cubeObject);
+    }
 
-
-        //Player
+    async addPlayer(position){
         const capsuleGeometry = await this.engine.loadMesh("./Models/Primitive/capsule.obj");
         const capsuleMaterial = new THREE.MeshStandardMaterial();
         const capsuleObject = new GameObject();
-        capsuleObject.setPosition(0, 5, 5);
-        capsuleObject.setRotation(0,0,0);
+        capsuleObject.setPosition(position.x, position.y, position.z);
         const capsuleShape = new CANNON.Box(new CANNON.Vec3(.5, 2, .5));
         capsuleObject.initPhysicsBody(this.engine.physicsWorld, capsuleShape, 0, 0, 1);
         capsuleObject.physicsBody.collisionFilterGroup = 2;
@@ -51,11 +43,36 @@ export class Program {
         this.engine.addGameObject(capsuleObject);
 
         const _playerControls = new PlayerControls(this.engine, this.engine.camera, capsuleObject.physicsBody);
-        CameraObj.addComponent(_playerControls);
+        capsuleObject.addComponent(_playerControls);
+
+    }
+
+    async start() {
+
+        //camera
+        this.engine.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.5, 1000);
+        this.engine.startRendering();
+
+        this.setupLighting();
+        this.setupScene();
+
+        //Cube
+        await this.AddCube(new THREE.Color(0, 0.5, 1), new THREE.Vector3(0,5,0), new THREE.Vector3(), 1);
+        await this.AddCube(new THREE.Color(1, 0, 0), new THREE.Vector3(5,5,-5), new THREE.Vector3(1,2,1), 1);
+
+
+        //player
+        await this.addPlayer(new THREE.Vector3(0,5,5));
 
         //ground
         const planeGeometry = await this.engine.loadMesh("./Models/Primitive/cube.obj");
         const planeMaterial = new THREE.MeshStandardMaterial();
+        const planeTex = await this.engine.loadTexture("./Textures/Required/Checkerboard.png");
+        planeTex.repeat.set(100, 100);
+        planeTex.wrapS = THREE.RepeatWrapping;
+        planeTex.wrapT = THREE.RepeatWrapping;
+
+        planeMaterial.map = planeTex;
         const planeObject = new GameObject();
         planeObject.setPosition(0, -2, 0);
         planeObject.setRotation(0,0,0);
@@ -73,12 +90,8 @@ export class Program {
     }
 
     setupLighting() {
-
-
         const light_ambient = new THREE.AmbientLight(0x616161);
         this.engine.scene.add(light_ambient);
-
-
 
         //shadowmap
         this.engine.renderer.shadowMap.enabled = true;
@@ -97,9 +110,6 @@ export class Program {
     }
 
     setupScene() {
-        this.engine.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        this.engine.renderer.outputEncoding = THREE.sRGBEncoding;
-
         //skybox
         const loader = new THREE.CubeTextureLoader();
         const textureCube = loader.load([
@@ -108,5 +118,18 @@ export class Program {
             './Textures/Skybox/Daylight Box_Front.bmp', './Textures/Skybox/Daylight Box_Back.bmp',
         ]);
         this.engine.scene.background = textureCube;
+
+
+        //post processing
+        this.engine.renderer.toneMapping = THREE.ReinhardToneMapping;
+
+        const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
+				bloomPass.threshold = 0;
+				bloomPass.strength = .1;
+				bloomPass.radius = 0;
+        
+        this.engine.renderer.toneMappingExposure = Math.pow( 1.3, 4.0 );
+        this.engine.composer.addPass(bloomPass);
+        this.engine.composer.addPass(new OutputPass());
     }
 }

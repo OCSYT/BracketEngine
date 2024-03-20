@@ -5,7 +5,6 @@ import { CSM } from 'three/addons/csm/CSM.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 
-
 export class Engine {
     constructor() {
         this.scene = new THREE.Scene();
@@ -21,12 +20,19 @@ export class Engine {
             gravity: new CANNON.Vec3(0, -9.82, 0) // m/s²
         });
 
-
+        this.composer = new EffectComposer(this.renderer);
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(this.renderer.domElement);
 
 
 
+    }
+
+    startRendering(){
+        if(this.camera && !this.renderPass){
+            this.renderPass = new RenderPass(this.scene, this.camera);
+            this.composer.addPass(this.renderPass);
+        }
     }
 
     start() {
@@ -85,13 +91,12 @@ export class Engine {
             this.camera.aspect = window.innerWidth / window.innerHeight;
             this.camera.updateProjectionMatrix();
             this.renderer.setSize(window.innerWidth, window.innerHeight);
-            if(!this.renderPass){
-                this.composer = new EffectComposer(this.renderer);
-                this.renderPass = new RenderPass(this.scene, this.camera);
-                this.composer.addPass(this.renderPass);
+            if(this.renderPass){
+                this.composer.render();
+                this.composer.setSize(window.innerWidth, window.innerHeight);
             }
             else{
-                this.composer.render();
+
             }
         }
     }
