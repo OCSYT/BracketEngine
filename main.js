@@ -7,13 +7,17 @@ function createWindow() {
     height: 600,
     autoHideMenuBar: true,
     webPreferences: {
-      nodeIntegration: true
+      nodeIntegration: true,
+      backgroundThrottling: false
     }
   });
-  
 
   // Load the index.html file
   mainWindow.loadFile('index.html');
 }
+
+setTimeout(()=>{
+app.commandLine.appendSwitch('disable-frame-rate-limit')
+},100);
 
 app.whenReady().then(createWindow);
