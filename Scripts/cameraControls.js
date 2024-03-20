@@ -26,23 +26,13 @@ export class CameraControls {
     }
 
     init() {
-        this.domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
-        this.domElement.addEventListener('click', this.onClick.bind(this));
+        window.domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
         window.addEventListener('keydown', this.onKeyDown.bind(this));
         window.addEventListener('keyup', this.onKeyUp.bind(this));
     }
 
-    onClick(event) {
-        try {
-            document.getElementsByTagName("canvas")[0].requestPointerLock();
-        }
-        catch {
-
-        }
-    }
-
-    onMouseMove(event) {
-
+    async onMouseMove(event) {
+        await document.body.requestPointerLock();
 
         this.mouseStopped = false;
         this.mouseX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
@@ -100,7 +90,7 @@ export class CameraControls {
     }
 
     update(deltaTime) {
-        const sensitivity = 1 * deltaTime;
+        const sensitivity = .5 * deltaTime;
         const deltaX = (this.mouseX) * sensitivity;
         const deltaY = (this.mouseY) * sensitivity;
 
