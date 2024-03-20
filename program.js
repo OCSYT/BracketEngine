@@ -48,7 +48,7 @@ export class Program {
     }
 
     async update(deltaTime) {
-
+        document.getElementById("fps").innerHTML = "FPS: " + this.engine.currentFPS;
     }
 
     setupLighting() {

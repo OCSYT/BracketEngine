@@ -12,6 +12,8 @@ export class Engine {
         this.gameObjects = [];
         this.isRunning = false;
         this.lastFrameTime = performance.now();
+        this.frameCount = 0;
+        this.currentFPS = 0;
         this.physicsWorld = new CANNON.World({
             gravity: new CANNON.Vec3(0,  -9.82,0) // m/s²
         });
@@ -32,9 +34,14 @@ export class Engine {
 
     update() {
         if (!this.isRunning) return;
+        
         const currentTime = performance.now();
+
+        
         const deltaTime = (currentTime - this.lastFrameTime) / 1000;
         this.lastFrameTime = currentTime;
+        this.calculateFPS(deltaTime);
+
 
         if (this.physicsWorld == null) return;
 
@@ -45,11 +52,21 @@ export class Engine {
             gameObject.update(deltaTime);
         });
 
-
         this.renderScene();
         requestAnimationFrame(() => this.update());
     }
 
+
+    calculateFPS(deltaTime) {
+        const elapsedSeconds = deltaTime * this.frameCount;
+        if (elapsedSeconds >= 1) { // Calculate FPS every 1 second
+            const fps = Math.round(this.frameCount / elapsedSeconds);
+            this.currentFPS = fps;
+            this.frameCount = 0; // Reset frame count
+        }
+        this.frameCount++;
+    }
+    
     renderScene() {
         if (this.camera != null) {
             this.camera.aspect = window.innerWidth / window.innerHeight;
