@@ -26,13 +26,13 @@ export class CameraControls {
     }
 
     init() {
-        window.domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
+        this.domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
         window.addEventListener('keydown', this.onKeyDown.bind(this));
         window.addEventListener('keyup', this.onKeyUp.bind(this));
     }
 
-    async onMouseMove(event) {
-        await document.body.requestPointerLock();
+    onMouseMove(event) {
+        document.body.requestPointerLock();
 
         this.mouseStopped = false;
         this.mouseX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
