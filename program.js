@@ -76,7 +76,7 @@ export class Program {
         this.engine.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
         let csm = new CSM({
-            maxFar: this.engine.camera.far,
+            maxFar: 250,
             cascades: 4,
             shadowMapSize: 4024,
             lightDirection: new THREE.Vector3(1, -1, 1).normalize(),
