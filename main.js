@@ -12,8 +12,12 @@ function createWindow() {
     }
   });
 
+
   // Load the index.html file
   mainWindow.loadFile('index.html');
+
+  app.commandLine.appendSwitch('disable-frame-rate-limit');
+
   const template = [
     {
       label: 'Developer',

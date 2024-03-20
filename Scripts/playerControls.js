@@ -115,7 +115,7 @@ export class PlayerControls {
         this.camera.getWorldQuaternion(quaternion);
         moveDirection.set(0, 0, -1).applyQuaternion(quaternion);
 
-        const moveSpeed = this.moveSpeed * 100 * deltaTime;
+        const moveSpeed = this.moveSpeed;
         const moveForce = moveDirection.clone().multiplyScalar(moveSpeed);
 
         var dampingFactor = 0.9;
@@ -132,7 +132,7 @@ export class PlayerControls {
             this.body.applyLocalForce(new CANNON.Vec3(-moveForce.z, 0, moveForce.x), new CANNON.Vec3(0, 0, 0));
         }
 
-        const currentpos = this.body.position.clone();
+        const currentpos = new CANNON.Vec3(this.gameObject.position.x, this.gameObject.position.y, this.gameObject.position.z);
         const raycastOptions = {
             collisionFilterMask: ~this.body.collisionFilterGroup
         };
@@ -144,10 +144,10 @@ export class PlayerControls {
         this.grounded = hit;
 
         const velocity = this.body.velocity;
-        velocity.x *= dampingFactor;
-        velocity.z *= dampingFactor;
+        velocity.x *= dampingFactor * deltaTime;
+        velocity.z *= dampingFactor * deltaTime;
         this.body.velocity = velocity;
 
-        this.camera.position.copy(this.body.position);
+        this.camera.position.copy(currentpos.vadd(new CANNON.Vec3(0, 1, 0)));
     }
 }

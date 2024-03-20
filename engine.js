@@ -13,13 +13,12 @@ export class Engine {
         this.renderer = new THREE.WebGLRenderer();
         this.gameObjects = [];
         this.isRunning = false;
-        this.lastFrameTime = performance.now();
         this.frameCount = 0;
         this.currentFPS = 0;
         this.physicsWorld = new CANNON.World({
             gravity: new CANNON.Vec3(0, -9.82, 0) // m/s²
         });
-
+        this.clock = new THREE.Clock();
         this.composer = new EffectComposer(this.renderer);
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(this.renderer.domElement);
@@ -28,8 +27,8 @@ export class Engine {
 
     }
 
-    startRendering(){
-        if(this.camera && !this.renderPass){
+    startRendering() {
+        if (this.camera && !this.renderPass) {
             this.renderPass = new RenderPass(this.scene, this.camera);
             this.composer.addPass(this.renderPass);
         }
@@ -49,11 +48,8 @@ export class Engine {
 
         const currentTime = performance.now();
 
-
-        const deltaTime = (currentTime - this.lastFrameTime) / 1000;
-        this.lastFrameTime = currentTime;
+        const deltaTime = this.clock.getDelta();
         this.calculateFPS(deltaTime);
-
 
         if (this.camera) {
             if (this.csm) {
@@ -72,6 +68,7 @@ export class Engine {
         });
 
         this.renderScene();
+        this.program.update(deltaTime);
         requestAnimationFrame(() => this.update());
     }
 
@@ -91,11 +88,11 @@ export class Engine {
             this.camera.aspect = window.innerWidth / window.innerHeight;
             this.camera.updateProjectionMatrix();
             this.renderer.setSize(window.innerWidth, window.innerHeight);
-            if(this.renderPass){
+            if (this.renderPass) {
                 this.composer.render();
                 this.composer.setSize(window.innerWidth, window.innerHeight);
             }
-            else{
+            else {
 
             }
         }
@@ -114,22 +111,22 @@ export class Engine {
         }
     }
 
-
     async loadMesh(url) {
-        return new Promise((resolve, reject) => {
+        try {
             const loader = new OBJLoader();
-
-            loader.load(
-                url,
-                object => {
-                    resolve(object);
-                },
-                undefined,
-                error => {
-                    reject(error);
-                }
-            );
-        });
+            const object = await new Promise((resolve, reject) => {
+                loader.load(
+                    url,
+                    resolve,
+                    undefined,
+                    reject
+                );
+            });
+            return object;
+        } catch (error) {
+            console.error(`Error loading mesh: ${error}`);
+            return null;
+        }
     }
 
     async loadShader(url) {
@@ -138,7 +135,6 @@ export class Engine {
     }
 
 
-    // Function to load a texture
     async loadTexture(url) {
         return new Promise((resolve, reject) => {
             const loader = new THREE.TextureLoader();
@@ -242,8 +238,8 @@ export class GameObject {
             this.position = this.physicsBody.position.clone();
 
             var rot = new CANNON.Vec3();
-            const {x,y,z,w} = this.physicsBody.quaternion.clone();
-            rot = new THREE.Euler().setFromQuaternion( new THREE.Quaternion(x,y,z,w), "XYZ");
+            const { x, y, z, w } = this.physicsBody.quaternion.clone();
+            rot = new THREE.Euler().setFromQuaternion(new THREE.Quaternion(x, y, z, w), "XYZ");
             this.rotation = { x: rot.x, y: rot.y, z: rot.z }
         }
     }
@@ -326,7 +322,7 @@ export class MeshComponent {
             const { position, rotation, scale } = this.gameObject;
             if (this.mesh) {
                 this.mesh.position.set(position.x, position.y, position.z);
-                    this.mesh.rotation.set(rotation.x, rotation.y, rotation.z);
+                this.mesh.rotation.set(rotation.x, rotation.y, rotation.z);
                 this.mesh.scale.set(scale.x, scale.y, scale.z);
             }
         }

@@ -6,6 +6,7 @@ import { CSM } from 'three/addons/csm/CSM.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 
+
 //post processing
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
@@ -61,6 +62,7 @@ export class Program {
         document.getElementById("fps").innerHTML = "FPS: " + this.engine.currentFPS;
     }
 
+
     async AddCube(color, position, rotation, mass) {
         const cubeGeometry = await this.engine.loadMesh("./Models/Primitive/cube.obj");
         const cubeMaterial = new THREE.MeshStandardMaterial();
@@ -82,7 +84,7 @@ export class Program {
         const capsuleMaterial = new THREE.MeshStandardMaterial();
         const capsuleObject = new GameObject();
         capsuleObject.setPosition(position.x, position.y, position.z);
-        const capsuleShape = new CANNON.Box(new CANNON.Vec3(.5, 2, .5));
+        const capsuleShape = new CANNON.Cylinder(1, 1, 4, 16);
         capsuleObject.initPhysicsBody(this.engine.physicsWorld, capsuleShape, 0, 0, 1);
         capsuleObject.physicsBody.collisionFilterGroup = 2;
         this.engine.csm.setupMaterial(capsuleMaterial);

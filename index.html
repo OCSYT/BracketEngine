@@ -86,21 +86,9 @@
                 const program = new Program();
                 document.title = program.applicationName;
                 program.engine = new Engine();
+                program.engine.program = program;
                 program.engine.start();
                 program.start();
-
-                let lastFrameTime = performance.now();
-
-                function update() {
-                    const currentTime = performance.now();
-                    const deltaTime = (currentTime - lastFrameTime) / 1000;
-                    lastFrameTime = currentTime;
-
-                    program.update(deltaTime);
-                    requestAnimationFrame(update);
-                }
-
-                update();
             } catch (error) {
                 console.error('Failed to import modules:', error);
             }
