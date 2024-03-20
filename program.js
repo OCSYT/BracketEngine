@@ -121,15 +121,20 @@ export class Program {
 
 
         //post processing
-        this.engine.renderer.toneMapping = THREE.ReinhardToneMapping;
 
+        //tonemapping
+        this.engine.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        this.engine.renderer.toneMappingExposure = Math.pow( 1, 4.0 );
+
+
+        //bloom
         const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
 				bloomPass.threshold = 0;
 				bloomPass.strength = .1;
 				bloomPass.radius = 0;
-        
-        this.engine.renderer.toneMappingExposure = Math.pow( 1.3, 4.0 );
         this.engine.composer.addPass(bloomPass);
+
+        //pass
         this.engine.composer.addPass(new OutputPass());
     }
 }
