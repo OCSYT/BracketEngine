@@ -124,7 +124,7 @@ export class Program {
 
         //tonemapping
         this.engine.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        this.engine.renderer.toneMappingExposure = Math.pow( 1, 4.0 );
+        this.engine.renderer.toneMappingExposure = Math.pow( 1.3, 4.0 );
 
 
         //bloom
