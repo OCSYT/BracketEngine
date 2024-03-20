@@ -50,7 +50,6 @@ export class Program {
         this.engine.csm.setupMaterial(capsuleMaterial);
         capsuleObject.addComponent(new MeshComponent(capsuleGeometry, [capsuleMaterial], true, true));
         this.engine.addGameObject(capsuleObject);
-        this.playerObj = capsuleObject;
 
         const _playerControls = new PlayerControls(this.engine, this.engine.camera, capsuleObject.physicsBody);
         CameraObj.addComponent(_playerControls);

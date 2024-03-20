@@ -49,6 +49,7 @@ export class Engine {
         this.lastFrameTime = currentTime;
         this.calculateFPS(deltaTime);
 
+
         if (this.camera) {
             if (this.csm) {
                 this.csm.update(this.camera.matrix);
