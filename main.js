@@ -1,4 +1,4 @@
-const { app, BrowserWindow, screen, remote, ipcMain } = require('electron');
+const { app, BrowserWindow, screen, remote, ipcMain, globalShortcut } = require('electron');
 const path = require('path');
 // Create the browser window
 function createWindow() {

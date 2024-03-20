@@ -1,13 +1,14 @@
 import * as THREE from './node_modules/three/build/three.module.js';
 import { OBJLoader } from './node_modules/three/examples/jsm/loaders/OBJLoader.js';
 import * as CANNON from './node_modules/cannon-es/dist/cannon-es.js';
-
+import {CSM} from './node_modules/three/examples/jsm/csm/CSM.js';
 
 
 export class Engine {
     constructor() {
         this.scene = new THREE.Scene();
         this.camera = null;
+        this.csm = null;
         this.renderer = new THREE.WebGLRenderer();
         this.gameObjects = [];
         this.isRunning = false;
@@ -41,6 +42,12 @@ export class Engine {
         const deltaTime = (currentTime - this.lastFrameTime) / 1000;
         this.lastFrameTime = currentTime;
         this.calculateFPS(deltaTime);
+
+        if(this.camera){
+            if(this.csm){
+                this.csm.update(this.camera.matrix);
+            }
+        }
 
 
         if (this.physicsWorld == null) return;
@@ -154,21 +161,30 @@ export class GameObject {
         this.physicsBody = null;
     }
 
-    initPhysicsBody(physicsWorld, shape, mass = 0) {
+    initPhysicsBody(physicsWorld, shape, friction = 1, mass = 0) {
         const { x, y, z } = this.position;
-        const { x: sx, y: sy, z: sz } = this.scale;
+        const { x: rotx, y: roty, z: rotz } = this.rotation;
+
+        const material = new CANNON.Material();
+        material.friction = friction;
+
+        const initialQuaternion = new CANNON.Quaternion();
+        initialQuaternion.setFromEuler(rotx, roty, rotz, "XYZ"); 
+    
 
         const body = new CANNON.Body({
             mass: mass,
             position: new CANNON.Vec3(x, y, z),
-            shape: shape
+            shape: shape,
+            material: material,
+            quaternion: initialQuaternion
         });
-
-
+    
         this.physicsBody = body;
-
+    
         physicsWorld.addBody(body);
     }
+    
 
     setPosition(x, y, z) {
         this.position.x = x;
@@ -191,7 +207,10 @@ export class GameObject {
     updatePhysics(deltaTime) {
         if (this.physicsBody) {
             this.position = this.physicsBody.position.clone();
-            this.rotation = this.physicsBody.quaternion.clone();
+            
+            const rot = new CANNON.Vec3();
+            this.physicsBody.quaternion.toEuler(rot);
+            this.rotation = {x: rot.x, y: rot.y, z: rot.z}
         }
     }
 
