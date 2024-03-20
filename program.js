@@ -5,7 +5,7 @@ import * as CANNON from './node_modules/cannon-es/dist/cannon-es.js';
 import {CSM} from './node_modules/three/examples/jsm/csm/CSM.js';
 
 
-import { playerControls } from './Scripts/playerControls.js';
+import { PlayerControls } from './Scripts/playerControls.js';
 
 export class Program {
     constructor() {
@@ -52,7 +52,7 @@ export class Program {
         this.engine.addGameObject(capsuleObject);
         this.playerObj = capsuleObject;
 
-        const _playerControls = new playerControls(this.engine, this.engine.camera, capsuleObject.physicsBody);
+        const _playerControls = new PlayerControls(this.engine, this.engine.camera, capsuleObject.physicsBody);
         CameraObj.addComponent(_playerControls);
 
         //ground

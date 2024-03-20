@@ -1,12 +1,12 @@
 import * as THREE from '../node_modules/three/build/three.module.js';
 import * as CANNON from '../node_modules/cannon-es/dist/cannon-es.js';
 
-export class playerControls {
+export class PlayerControls {
     constructor(engine, camera, body, domElement) {
         this.camera = camera;
         this.engine = engine;
         this.body = body;
-        this.body.angularFactor = new CANNON.Vec3(0, 0, 0);
+        this.body.angularFactor.set(0, 0, 0);
 
         this.domElement = domElement || document;
 
@@ -14,7 +14,7 @@ export class playerControls {
         this.mouseY = 0;
         this.init();
         this.mouseStopped = true;
-        this.timer = null; // Initialize timer variable
+        this.timer = null;
 
         this.moveForward = false;
         this.moveBackward = false;
@@ -27,7 +27,7 @@ export class playerControls {
 
         this.grounded = false;
 
-        this.jumpSpeed = 400; // Adjust the jump speed as needed
+        this.jumpSpeed = 400;
         this.canJump = true;
     }
 
@@ -65,7 +65,6 @@ export class playerControls {
                 break;
         }
 
-        // Check if space key is pressed and the player can jump
         if (event.key === ' ' && this.canJump) {
             this.jump();
         }
@@ -89,12 +88,8 @@ export class playerControls {
     }
 
     jump() {
-        // Check if the player can jump
         if (this.canJump && this.grounded) {
-
             this.body.applyForce(new CANNON.Vec3(0, this.jumpSpeed, 0));
-
-
             this.canJump = false;
             setTimeout(() => {
                 this.canJump = true;
@@ -107,7 +102,6 @@ export class playerControls {
         const deltaX = this.mouseX * sensitivity;
         const deltaY = this.mouseY * sensitivity;
 
-        // Update camera rotation based on mouse movement
         if (!this.mouseStopped) {
             this.rotY -= deltaX;
             this.rotX -= deltaY;
@@ -116,16 +110,13 @@ export class playerControls {
             this.camera.quaternion.setFromEuler(euler);
         }
 
-        // Calculate movement direction based on camera orientation
         const moveDirection = new THREE.Vector3();
         const quaternion = new THREE.Quaternion();
         this.camera.getWorldQuaternion(quaternion);
         moveDirection.set(0, 0, -1).applyQuaternion(quaternion);
 
-        // Apply movement force
         const moveSpeed = this.moveSpeed * 100 * deltaTime;
         const moveForce = moveDirection.clone().multiplyScalar(moveSpeed);
-
 
         var dampingFactor = 0.9;
         if (this.moveForward) {
@@ -139,15 +130,9 @@ export class playerControls {
         }
         if (this.moveRight) {
             this.body.applyLocalForce(new CANNON.Vec3(-moveForce.z, 0, moveForce.x), new CANNON.Vec3(0, 0, 0));
-
         }
 
-
-
-
-        const currentpos = new CANNON.Vec3(this.body.position.x, this.body.position.y, this.body.position.z);
-
-
+        const currentpos = this.body.position.clone();
         const raycastOptions = {
             collisionFilterMask: ~this.body.collisionFilterGroup
         };
@@ -155,21 +140,14 @@ export class playerControls {
         let hit = false;
         this.engine.physicsWorld.raycastAll(currentpos, currentpos.vadd(new CANNON.Vec3(0, -2, 0)), raycastOptions, (raycastResult) => {
             hit = true;
-            console.log("hit");
         });
-        if (hit) {
-            this.grounded = true;
-        }
-        else {
-            this.grounded = false;
-        }
+        this.grounded = hit;
 
         const velocity = this.body.velocity;
         velocity.x *= dampingFactor;
         velocity.z *= dampingFactor;
         this.body.velocity = velocity;
 
-        // Update camera position
         this.camera.position.copy(this.body.position);
     }
 }
