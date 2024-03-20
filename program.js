@@ -18,38 +18,6 @@ export class Program {
         this.applicationName = "BracketEngine Sample Scene";
     }
 
-    async AddCube(color, position, rotation, mass) {
-        const cubeGeometry = await this.engine.loadMesh("./Models/Primitive/cube.obj");
-        const cubeMaterial = new THREE.MeshStandardMaterial();
-        const cubeTex = await this.engine.loadTexture("./Textures/Required/Checkerboard.png");
-        cubeMaterial.map = cubeTex;
-        cubeMaterial.color.set(color);
-        const cubeObject = new GameObject();
-        cubeObject.setPosition(position.x, position.y, position.z);
-        cubeObject.setRotation(rotation.x, rotation.y, rotation.z);
-        const cubeShape = new CANNON.Box(new CANNON.Vec3(1, 1, 1));
-        cubeObject.initPhysicsBody(this.engine.physicsWorld, cubeShape, 0.5, 1, mass);
-        this.engine.csm.setupMaterial(cubeMaterial);
-        cubeObject.addComponent(new MeshComponent(cubeGeometry, [cubeMaterial], true, true));
-        this.engine.addGameObject(cubeObject);
-    }
-
-    async addPlayer(position) {
-        const capsuleGeometry = await this.engine.loadMesh("./Models/Primitive/capsule.obj");
-        const capsuleMaterial = new THREE.MeshStandardMaterial();
-        const capsuleObject = new GameObject();
-        capsuleObject.setPosition(position.x, position.y, position.z);
-        const capsuleShape = new CANNON.Box(new CANNON.Vec3(.5, 2, .5));
-        capsuleObject.initPhysicsBody(this.engine.physicsWorld, capsuleShape, 0, 0, 1);
-        capsuleObject.physicsBody.collisionFilterGroup = 2;
-        this.engine.csm.setupMaterial(capsuleMaterial);
-        capsuleObject.addComponent(new MeshComponent(capsuleGeometry, [capsuleMaterial], true, true));
-        this.engine.addGameObject(capsuleObject);
-
-        const _playerControls = new PlayerControls(this.engine, this.engine.camera, capsuleObject.physicsBody);
-        capsuleObject.addComponent(_playerControls);
-
-    }
 
     async start() {
 
@@ -92,6 +60,40 @@ export class Program {
     async update(deltaTime) {
         document.getElementById("fps").innerHTML = "FPS: " + this.engine.currentFPS;
     }
+
+    async AddCube(color, position, rotation, mass) {
+        const cubeGeometry = await this.engine.loadMesh("./Models/Primitive/cube.obj");
+        const cubeMaterial = new THREE.MeshStandardMaterial();
+        const cubeTex = await this.engine.loadTexture("./Textures/Required/Checkerboard.png");
+        cubeMaterial.map = cubeTex;
+        cubeMaterial.color.set(color);
+        const cubeObject = new GameObject();
+        cubeObject.setPosition(position.x, position.y, position.z);
+        cubeObject.setRotation(rotation.x, rotation.y, rotation.z);
+        const cubeShape = new CANNON.Box(new CANNON.Vec3(1, 1, 1));
+        cubeObject.initPhysicsBody(this.engine.physicsWorld, cubeShape, 0.5, 1, mass);
+        this.engine.csm.setupMaterial(cubeMaterial);
+        cubeObject.addComponent(new MeshComponent(cubeGeometry, [cubeMaterial], true, true));
+        this.engine.addGameObject(cubeObject);
+    }
+
+    async addPlayer(position) {
+        const capsuleGeometry = await this.engine.loadMesh("./Models/Primitive/capsule.obj");
+        const capsuleMaterial = new THREE.MeshStandardMaterial();
+        const capsuleObject = new GameObject();
+        capsuleObject.setPosition(position.x, position.y, position.z);
+        const capsuleShape = new CANNON.Box(new CANNON.Vec3(.5, 2, .5));
+        capsuleObject.initPhysicsBody(this.engine.physicsWorld, capsuleShape, 0, 0, 1);
+        capsuleObject.physicsBody.collisionFilterGroup = 2;
+        this.engine.csm.setupMaterial(capsuleMaterial);
+        capsuleObject.addComponent(new MeshComponent(capsuleGeometry, [capsuleMaterial], true, true));
+        this.engine.addGameObject(capsuleObject);
+
+        const _playerControls = new PlayerControls(this.engine, this.engine.camera, capsuleObject.physicsBody);
+        capsuleObject.addComponent(_playerControls);
+
+    }
+
 
     setupLighting() {
         const light_ambient = new THREE.AmbientLight(0x616161);
