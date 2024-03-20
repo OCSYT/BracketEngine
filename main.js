@@ -15,7 +15,7 @@ function createWindow() {
   // Load the index.html file
   mainWindow.loadFile('index.html');
 
-  mainWindow.setMenu(null) 
+  //mainWindow.setMenu(null) 
 }
 
 

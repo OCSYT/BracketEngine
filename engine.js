@@ -2,7 +2,10 @@ import * as THREE from './node_modules/three/build/three.module.js';
 import { OBJLoader } from './node_modules/three/examples/jsm/loaders/OBJLoader.js';
 import * as CANNON from './node_modules/cannon-es/dist/cannon-es.js';
 import { CSM } from './node_modules/three/examples/jsm/csm/CSM.js';
-
+import { EffectComposer } from "EffectComposer";
+import { RenderPass } from "RenderPass";
+import { ShaderPass } from "ShaderPass";
+import { FXAAShader } from "FXAAShader";
 
 export class Engine {
     constructor() {
@@ -22,6 +25,9 @@ export class Engine {
 
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(this.renderer.domElement);
+
+
+
     }
 
     start() {
@@ -79,7 +85,14 @@ export class Engine {
             this.camera.aspect = window.innerWidth / window.innerHeight;
             this.camera.updateProjectionMatrix();
             this.renderer.setSize(window.innerWidth, window.innerHeight);
-            this.renderer.render(this.scene, this.camera);
+            if(!this.renderPass){
+                this.composer = new EffectComposer(this.renderer);
+                this.renderPass = new RenderPass(this.scene, this.camera);
+                this.composer.addPass(this.renderPass);
+            }
+            else{
+                this.composer.render();
+            }
         }
     }
 
