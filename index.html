@@ -30,64 +30,73 @@
     <div class="ui-overlay">
     </div>
 
-    <script type="importmap">
-        {
-          "imports": {
-            "three": "./node_modules/three/build/three.module.js",
-            "three/addons/": "./node_modules/three/examples/jsm/",
-            "CANNON": "./node_modules/cannon-es/dist/cannon-es.js"
+    <script>
+        // Function to fetch JSON file contents
+        function fetchImportMap(url) {
+          return fetch(url)
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Failed to fetch import map');
+              }
+              return response.json();
+            });
+        }
+      
+        // Function to append import map to the document
+        function appendImportMap(importMap) {
+          const script = document.createElement('script');
+          script.type = 'importmap';
+          script.textContent = JSON.stringify(importMap);
+          document.head.appendChild(script);
+
+          // Now that the import map is applied, start loading modules
+          loadModules();
+        }
+
+        // Function to load modules
+        async function loadModules() {
+          try {
+            const { Engine } = await import('./engine.js');
+            const { Program } = await import('./program.js');
+
+
+
+            // Once modules are imported, continue with program initialization
+            const program = new Program();
+            document.title = program.applicationName;
+            program.engine = new Engine();
+            program.engine.start();
+            program.start();
+            
+            let lastFrameTime = performance.now();
+            
+            function update() {
+              const currentTime = performance.now();
+              const deltaTime = (currentTime - lastFrameTime) / 1000;
+              lastFrameTime = currentTime;
+              
+              program.update(deltaTime);
+              requestAnimationFrame(update);
+            }
+            
+            update();
+          } catch (error) {
+            console.error('Failed to import modules:', error);
           }
         }
-      </script>
       
-    <script type="module">
-        async function appendUIContent() {
-            try {
-                // Fetch the ui.html file
-                const response = await fetch('./UI/ui.html');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch UI content');
-                }
-
-                // Get the HTML content from the response
-                const htmlContent = await response.text();
-
-                // Append the HTML content to the .ui-overlay div
-                const uiOverlay = document.querySelector('.ui-overlay');
-                uiOverlay.innerHTML = htmlContent;
-            } catch (error) {
-                console.error(error);
-            }
-        }
-        await appendUIContent();
-
-        import { Engine } from "./engine.js";
-        import { Program } from "./program.js";
-
-        const program = new Program();
-        document.title = program.applicationName;
-        program.engine = new Engine();
-        program.engine.start();
-        program.start();
-
-        
-        let lastFrameTime = performance.now();
-        
-        function update() {
-            const currentTime = performance.now();
-            const deltaTime = (currentTime - lastFrameTime) / 1000;
-            lastFrameTime = currentTime;
-            
-            program.update(deltaTime);
-            requestAnimationFrame(update);
-        }
-        
-        update();
-
-    </script>
-    
-    
-    
+        // URL of the JSON file containing the import map
+        const importMapUrl = './imports.json'; // Replace with the actual URL
+      
+        // Fetch and append the import map
+        fetchImportMap(importMapUrl)
+          .then(importMap => {
+            appendImportMap(importMap);
+          })
+          .catch(error => {
+            console.error('Failed to fetch or append import map:', error);
+          });
+      </script>
 </body>
 
 </html>

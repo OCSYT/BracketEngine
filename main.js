@@ -1,4 +1,4 @@
-const { app, BrowserWindow, screen, remote, ipcMain, globalShortcut } = require('electron');
+const { app, BrowserWindow, screen, remote, ipcMain, Menu, globalShortcut } = require('electron');
 const path = require('path');
 // Create the browser window
 function createWindow() {
@@ -14,8 +14,32 @@ function createWindow() {
 
   // Load the index.html file
   mainWindow.loadFile('index.html');
+  const template = [
+    {
+      label: 'Developer',
+      submenu: [
+        {
+          label: 'Toggle Developer Tools',
+          accelerator: 'CmdOrCtrl+Shift+I', // Shortcut for opening the inspector
+          click: () => {
+            mainWindow.webContents.toggleDevTools();
+          }
+        }
+      ]
+    }
+  ];
 
-  mainWindow.setMenu(null) 
+  // Build menu from template
+  const menu = Menu.buildFromTemplate(template);
+
+  // Set application menu
+  Menu.setApplicationMenu(menu);
+
+  // Register global shortcut for inspector
+  globalShortcut.register('CmdOrCtrl+Shift+I', () => {
+    mainWindow.webContents.toggleDevTools();
+  });
+
 }
 
 
