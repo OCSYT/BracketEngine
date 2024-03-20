@@ -3,10 +3,14 @@ import * as THREE from 'three';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import * as CANNON from './node_modules/cannon-es/dist/cannon-es.js';
 import { CSM } from 'three/addons/csm/CSM.js';
-import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 
+//post processing
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
+
+//custom scripts
 import { PlayerControls } from './Scripts/playerControls.js';
 
 export class Program {
@@ -22,7 +26,7 @@ export class Program {
         cubeMaterial.color.set(color);
         const cubeObject = new GameObject();
         cubeObject.setPosition(position.x, position.y, position.z);
-        cubeObject.setRotation(rotation.x,rotation.y,rotation.z);
+        cubeObject.setRotation(rotation.x, rotation.y, rotation.z);
         const cubeShape = new CANNON.Box(new CANNON.Vec3(1, 1, 1));
         cubeObject.initPhysicsBody(this.engine.physicsWorld, cubeShape, 0.5, 1, mass);
         this.engine.csm.setupMaterial(cubeMaterial);
@@ -30,7 +34,7 @@ export class Program {
         this.engine.addGameObject(cubeObject);
     }
 
-    async addPlayer(position){
+    async addPlayer(position) {
         const capsuleGeometry = await this.engine.loadMesh("./Models/Primitive/capsule.obj");
         const capsuleMaterial = new THREE.MeshStandardMaterial();
         const capsuleObject = new GameObject();
@@ -57,12 +61,12 @@ export class Program {
         this.setupScene();
 
         //Cube
-        await this.AddCube(new THREE.Color(0, 0.5, 1), new THREE.Vector3(0,5,0), new THREE.Vector3(), 1);
-        await this.AddCube(new THREE.Color(1, 0, 0), new THREE.Vector3(5,5,-5), new THREE.Vector3(1,2,1), 1);
+        await this.AddCube(new THREE.Color(0, 0.5, 1), new THREE.Vector3(0, 5, 0), new THREE.Vector3(), 1);
+        await this.AddCube(new THREE.Color(1, 0, 0), new THREE.Vector3(5, 5, -5), new THREE.Vector3(1, 2, 1), 1);
 
 
         //player
-        await this.addPlayer(new THREE.Vector3(0,5,5));
+        await this.addPlayer(new THREE.Vector3(0, 5, 5));
 
         //ground
         const planeGeometry = await this.engine.loadMesh("./Models/Primitive/cube.obj");
@@ -75,14 +79,14 @@ export class Program {
         planeMaterial.map = planeTex;
         const planeObject = new GameObject();
         planeObject.setPosition(0, -2, 0);
-        planeObject.setRotation(0,0,0);
+        planeObject.setRotation(0, 0, 0);
         planeObject.setScale(100, 1, 100);
         const planeShape = new CANNON.Box(new CANNON.Vec3(100, 1, 100));
         planeObject.initPhysicsBody(this.engine.physicsWorld, planeShape, 0.5, 1, 0);
         this.engine.csm.setupMaterial(planeMaterial);
         planeObject.addComponent(new MeshComponent(planeGeometry, [planeMaterial], true, true));
         this.engine.addGameObject(planeObject);
-    
+
     }
 
     async update(deltaTime) {
@@ -124,17 +128,45 @@ export class Program {
 
         //tonemapping
         this.engine.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        this.engine.renderer.toneMappingExposure = Math.pow( 1.3, 4.0 );
+        this.engine.renderer.toneMappingExposure = 1.3;
 
+
+        const AO = new GTAOPass(this.engine.scene, this.engine.camera, window.innerWidth, window.innerHeight);
+
+        this.engine.composer.addPass(AO);
+        const aoParameters = {
+            radius: 0.25,
+            distanceExponent: 1.,
+            thickness: 1.,
+            scale: 5.,
+            samples: 16,
+            distanceFallOff: 1.,
+            screenSpaceRadius: true,
+        };
+        const pdParameters = {
+            lumaPhi: 10.,
+            depthPhi: 2.,
+            normalPhi: 3.,
+            radius: 4.,
+            radiusExponent: 1.,
+            rings: 2.,
+            samples: 16,
+        };
+        AO.updateGtaoMaterial( aoParameters );
+        AO.updatePdMaterial( pdParameters );
+        
 
         //bloom
-        const bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
-				bloomPass.threshold = 0;
-				bloomPass.strength = .1;
-				bloomPass.radius = 0;
+        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+        bloomPass.threshold = 0;
+        bloomPass.strength = .1;
+        bloomPass.radius = 0;
         this.engine.composer.addPass(bloomPass);
+
 
         //pass
         this.engine.composer.addPass(new OutputPass());
+
+
     }
 }
