@@ -1,11 +1,9 @@
-import * as THREE from './node_modules/three/build/three.module.js';
-import { OBJLoader } from './node_modules/three/examples/jsm/loaders/OBJLoader.js';
+import * as THREE from 'three';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import * as CANNON from './node_modules/cannon-es/dist/cannon-es.js';
-import { CSM } from './node_modules/three/examples/jsm/csm/CSM.js';
-import { EffectComposer } from "EffectComposer";
-import { RenderPass } from "RenderPass";
-import { ShaderPass } from "ShaderPass";
-import { FXAAShader } from "FXAAShader";
+import { CSM } from 'three/addons/csm/CSM.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 
 export class Engine {
     constructor() {

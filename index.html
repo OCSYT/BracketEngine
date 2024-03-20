@@ -29,22 +29,17 @@
 <body>
     <div class="ui-overlay">
     </div>
+
     <script type="importmap">
         {
           "imports": {
             "three": "./node_modules/three/build/three.module.js",
-            "OBJLoader": "./node_modules/three/examples/jsm/loaders/OBJLoader.js",
-            "CANNON": "./node_modules/cannon-es/dist/cannon-es.js",
-            "CSM": "./node_modules/three/examples/jsm/csm/CSM.js",
-            "Stats": "./node_modules/three/examples/jsm/libs/stats.module.js",
-            "EffectComposer": "./node_modules/three/examples/jsm/postprocessing/EffectComposer.js",
-            "UnrealBloomPass": "./node_modules/three/examples/jsm/postprocessing/UnrealBloomPass.js",
-            "RenderPass": "./node_modules/three/examples/jsm/postprocessing/RenderPass.js",
-            "ShaderPass": "./node_modules/three/examples/jsm/postprocessing/ShaderPass.js",
-            "FXAAShader": "./node_modules/three/examples/jsm/shaders/FXAAShader.js"
+            "three/addons/": "./node_modules/three/examples/jsm/",
+            "CANNON": "./node_modules/cannon-es/dist/cannon-es.js"
           }
         }
       </script>
+      
     <script type="module">
         async function appendUIContent() {
             try {

@@ -1,9 +1,8 @@
 import { Engine, GameObject, MeshComponent } from './engine.js';
-import * as THREE from './node_modules/three/build/three.module.js';
-import { OBJLoader } from './node_modules/three/examples/jsm/loaders/OBJLoader.js';
+import * as THREE from 'three';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import * as CANNON from './node_modules/cannon-es/dist/cannon-es.js';
-import {CSM} from './node_modules/three/examples/jsm/csm/CSM.js';
-
+import { CSM } from 'three/addons/csm/CSM.js';
 
 import { PlayerControls } from './Scripts/playerControls.js';
 
