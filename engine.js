@@ -1,7 +1,7 @@
 import * as THREE from './node_modules/three/build/three.module.js';
 import { OBJLoader } from './node_modules/three/examples/jsm/loaders/OBJLoader.js';
 import * as CANNON from './node_modules/cannon-es/dist/cannon-es.js';
-import {CSM} from './node_modules/three/examples/jsm/csm/CSM.js';
+import { CSM } from './node_modules/three/examples/jsm/csm/CSM.js';
 
 
 export class Engine {
@@ -16,7 +16,7 @@ export class Engine {
         this.frameCount = 0;
         this.currentFPS = 0;
         this.physicsWorld = new CANNON.World({
-            gravity: new CANNON.Vec3(0,  -9.82,0) // m/s²
+            gravity: new CANNON.Vec3(0, -9.82, 0) // m/s²
         });
 
 
@@ -35,16 +35,16 @@ export class Engine {
 
     update() {
         if (!this.isRunning) return;
-        
+
         const currentTime = performance.now();
 
-        
+
         const deltaTime = (currentTime - this.lastFrameTime) / 1000;
         this.lastFrameTime = currentTime;
         this.calculateFPS(deltaTime);
 
-        if(this.camera){
-            if(this.csm){
+        if (this.camera) {
+            if (this.csm) {
                 this.csm.update(this.camera.matrix);
             }
         }
@@ -73,7 +73,7 @@ export class Engine {
         }
         this.frameCount++;
     }
-    
+
     renderScene() {
         if (this.camera != null) {
             this.camera.aspect = window.innerWidth / window.innerHeight;
@@ -161,16 +161,17 @@ export class GameObject {
         this.physicsBody = null;
     }
 
-    initPhysicsBody(physicsWorld, shape, friction = 1, mass = 0) {
+    initPhysicsBody(physicsWorld, shape, restitution = 0.5, friction = 1, mass = 0) {
         const { x, y, z } = this.position;
         const { x: rotx, y: roty, z: rotz } = this.rotation;
 
         const material = new CANNON.Material();
         material.friction = friction;
+        material.restitution = restitution;
 
         const initialQuaternion = new CANNON.Quaternion();
-        initialQuaternion.setFromEuler(rotx, roty, rotz, "XYZ"); 
-    
+        initialQuaternion.setFromEuler(rotx, roty, rotz, "XYZ");
+
 
         const body = new CANNON.Body({
             mass: mass,
@@ -179,23 +180,37 @@ export class GameObject {
             material: material,
             quaternion: initialQuaternion
         });
-    
+
         this.physicsBody = body;
-    
+
         physicsWorld.addBody(body);
     }
-    
+
 
     setPosition(x, y, z) {
-        this.position.x = x;
-        this.position.y = y;
-        this.position.z = z;
+        if (!this.physicsBody) {
+            this.position.x = x;
+            this.position.y = y;
+            this.position.z = z;
+        }
+        else {
+            this.physicsBody.x = x;
+            this.physicsBody.y = y;
+            this.physicsBody.z = z;
+        }
     }
 
     setRotation(x, y, z) {
-        this.rotation.x = x;
-        this.rotation.y = y;
-        this.rotation.z = z;
+        if (!this.physicsBody) {
+            this.rotation.x = x;
+            this.rotation.y = y;
+            this.rotation.z = z;
+        }
+        else {
+            const initialQuaternion = new CANNON.Quaternion();
+            initialQuaternion.setFromEuler(x, y, z, "XYZ");
+            this.physicsBody.quaternion = initialQuaternion;
+        }
     }
 
     setScale(x, y, z) {
@@ -207,10 +222,11 @@ export class GameObject {
     updatePhysics(deltaTime) {
         if (this.physicsBody) {
             this.position = this.physicsBody.position.clone();
-            
-            const rot = new CANNON.Vec3();
-            this.physicsBody.quaternion.toEuler(rot);
-            this.rotation = {x: rot.x, y: rot.y, z: rot.z}
+
+            var rot = new CANNON.Vec3();
+            const {x,y,z,w} = this.physicsBody.quaternion.clone();
+            rot = new THREE.Euler().setFromQuaternion( new THREE.Quaternion(x,y,z,w), "XYZ");
+            this.rotation = { x: rot.x, y: rot.y, z: rot.z }
         }
     }
 
@@ -244,6 +260,7 @@ export class GameObject {
     }
 
     addComponent(component) {
+        component.gameObject = this;
         this.components.push(component);
     }
 
@@ -291,7 +308,7 @@ export class MeshComponent {
             const { position, rotation, scale } = this.gameObject;
             if (this.mesh) {
                 this.mesh.position.set(position.x, position.y, position.z);
-                this.mesh.rotation.set(rotation.x, rotation.y, rotation.z);
+                    this.mesh.rotation.set(rotation.x, rotation.y, rotation.z);
                 this.mesh.scale.set(scale.x, scale.y, scale.z);
             }
         }

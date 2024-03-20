@@ -5,7 +5,7 @@ import * as CANNON from './node_modules/cannon-es/dist/cannon-es.js';
 import {CSM} from './node_modules/three/examples/jsm/csm/CSM.js';
 
 
-import { CameraControls } from './Scripts/cameraControls.js';
+import { playerControls } from './Scripts/playerControls.js';
 
 export class Program {
     constructor() {
@@ -15,14 +15,9 @@ export class Program {
     async start() {
 
         //camera
-        this.engine.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        this.engine.camera.position.z = 5;
-
-        const cameraControls = new CameraControls(this.engine.camera);
+        this.engine.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.5, 1000);
         const CameraObj = new GameObject();
-        CameraObj.addComponent(cameraControls);
         this.engine.addGameObject(CameraObj);
-
 
 
         this.setupLighting();
@@ -37,10 +32,28 @@ export class Program {
         cubeObject.setPosition(0, 5, 0);
         cubeObject.setRotation(0,0,0);
         const cubeShape = new CANNON.Box(new CANNON.Vec3(1, 1, 1));
-        cubeObject.initPhysicsBody(this.engine.physicsWorld, cubeShape, 1, 1);
+        cubeObject.initPhysicsBody(this.engine.physicsWorld, cubeShape, 0.5, 1, 1);
         this.engine.csm.setupMaterial(cubeMaterial);
         cubeObject.addComponent(new MeshComponent(cubeGeometry, [cubeMaterial], true, true));
         this.engine.addGameObject(cubeObject);
+
+
+        //Player
+        const capsuleGeometry = await this.engine.loadMesh("./Models/Primitive/capsule.obj");
+        const capsuleMaterial = new THREE.MeshStandardMaterial();
+        const capsuleObject = new GameObject();
+        capsuleObject.setPosition(0, 5, 5);
+        capsuleObject.setRotation(0,0,0);
+        const capsuleShape = new CANNON.Box(new CANNON.Vec3(.5, 2, .5));
+        capsuleObject.initPhysicsBody(this.engine.physicsWorld, capsuleShape, 0, 0, 1);
+        capsuleObject.physicsBody.collisionFilterGroup = 2;
+        this.engine.csm.setupMaterial(capsuleMaterial);
+        capsuleObject.addComponent(new MeshComponent(capsuleGeometry, [capsuleMaterial], true, true));
+        this.engine.addGameObject(capsuleObject);
+        this.playerObj = capsuleObject;
+
+        const _playerControls = new playerControls(this.engine, this.engine.camera, capsuleObject.physicsBody);
+        CameraObj.addComponent(_playerControls);
 
         //ground
         const planeGeometry = await this.engine.loadMesh("./Models/Primitive/cube.obj");
@@ -50,7 +63,7 @@ export class Program {
         planeObject.setRotation(0,0,0);
         planeObject.setScale(100, 1, 100);
         const planeShape = new CANNON.Box(new CANNON.Vec3(100, 1, 100));
-        planeObject.initPhysicsBody(this.engine.physicsWorld, planeShape, 1, 0);
+        planeObject.initPhysicsBody(this.engine.physicsWorld, planeShape, 0.5, 1, 0);
         this.engine.csm.setupMaterial(planeMaterial);
         planeObject.addComponent(new MeshComponent(planeGeometry, [planeMaterial], true, true));
         this.engine.addGameObject(planeObject);
@@ -62,8 +75,6 @@ export class Program {
     }
 
     setupLighting() {
-        this.engine.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        this.engine.renderer.outputEncoding = THREE.sRGBEncoding;
 
 
         const light_ambient = new THREE.AmbientLight(0x616161);
@@ -78,7 +89,7 @@ export class Program {
         let csm = new CSM({
             maxFar: 250,
             cascades: 4,
-            shadowMapSize: 4024,
+            shadowMapSize: 2024,
             lightDirection: new THREE.Vector3(1, -1, 1).normalize(),
             camera: this.engine.camera,
             parent: this.engine.scene,
@@ -88,6 +99,9 @@ export class Program {
     }
 
     setupScene() {
+        this.engine.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        this.engine.renderer.outputEncoding = THREE.sRGBEncoding;
+
         //skybox
         const loader = new THREE.CubeTextureLoader();
         const textureCube = loader.load([

@@ -14,10 +14,9 @@ function createWindow() {
 
   // Load the index.html file
   mainWindow.loadFile('index.html');
+
+  mainWindow.setMenu(null) 
 }
 
-setTimeout(()=>{
-app.commandLine.appendSwitch('disable-frame-rate-limit')
-},100);
 
 app.whenReady().then(createWindow);
