@@ -23,6 +23,8 @@ export class PlayerControls {
 
         this.jumpSpeed = 400;
         this.canJump = true;
+
+        this.prevVel = new CANNON.Vec3();
     }
 
 
@@ -86,13 +88,13 @@ export class PlayerControls {
         }
     }
 
-    start(){
+    start() {
         document.addEventListener('mousemove', this.onMouseMove.bind(this));
         document.addEventListener('keydown', this.onKeyDown.bind(this));
         document.addEventListener('keyup', this.onKeyUp.bind(this));
     }
-    
-    update(deltaTime){
+
+    update(deltaTime) {
         const sensitivity = 0.5 * deltaTime;
         const deltaX = this.mouseX * sensitivity;
         const deltaY = this.mouseY * sensitivity;
@@ -112,25 +114,27 @@ export class PlayerControls {
     fixedUpdate() {
 
         const moveDirection = new THREE.Vector3();
-        const quaternion =  new THREE.Quaternion(this.body.quaternion.x, this.body.quaternion.y, this.body.quaternion.z, this.body.quaternion.w);
+        const quaternion = new THREE.Quaternion(this.body.quaternion.x, this.body.quaternion.y, this.body.quaternion.z, this.body.quaternion.w);
         moveDirection.set(0, 0, -1).applyQuaternion(quaternion);
 
-        
+
         const moveSpeed = this.moveSpeed;
         const moveForce = moveDirection.clone().multiplyScalar(moveSpeed);
 
         var dampingFactor = .9;
-        if (this.moveForward) {
-            this.body.applyLocalForce(new CANNON.Vec3(moveForce.x, 0, moveForce.z), new CANNON.Vec3(0, 0, 0));
-        }
-        if (this.moveBackward) {
-            this.body.applyLocalForce(new CANNON.Vec3(-moveForce.x, 0, -moveForce.z), new CANNON.Vec3(0, 0, 0));
-        }
-        if (this.moveLeft) {
-            this.body.applyLocalForce(new CANNON.Vec3(moveForce.z, 0, -moveForce.x), new CANNON.Vec3(0, 0, 0));
-        }
-        if (this.moveRight) {
-            this.body.applyLocalForce(new CANNON.Vec3(-moveForce.z, 0, moveForce.x), new CANNON.Vec3(0, 0, 0));
+        if (this.grounded) {
+            if (this.moveForward) {
+                this.body.applyLocalForce(new CANNON.Vec3(moveForce.x, 0, moveForce.z), new CANNON.Vec3(0, 0, 0));
+            }
+            if (this.moveBackward) {
+                this.body.applyLocalForce(new CANNON.Vec3(-moveForce.x, 0, -moveForce.z), new CANNON.Vec3(0, 0, 0));
+            }
+            if (this.moveLeft) {
+                this.body.applyLocalForce(new CANNON.Vec3(moveForce.z, 0, -moveForce.x), new CANNON.Vec3(0, 0, 0));
+            }
+            if (this.moveRight) {
+                this.body.applyLocalForce(new CANNON.Vec3(-moveForce.z, 0, moveForce.x), new CANNON.Vec3(0, 0, 0));
+            }
         }
 
         const currentpos = new CANNON.Vec3(this.gameObject.position.x, this.gameObject.position.y, this.gameObject.position.z);
@@ -138,17 +142,27 @@ export class PlayerControls {
             collisionFilterMask: ~this.body.collisionFilterGroup
         };
 
+
+
         let hit = false;
         this.engine.physicsWorld.raycastAll(currentpos, currentpos.vadd(new CANNON.Vec3(0, -2, 0)), raycastOptions, (raycastResult) => {
             hit = true;
         });
         this.grounded = hit;
 
-        const velocity = this.body.velocity;
-        velocity.x *= dampingFactor;
-        velocity.z *= dampingFactor;
+        let velocity = null;
+        if (this.grounded) {
+            velocity = this.body.velocity;
+            velocity.x *= dampingFactor;
+            velocity.z *= dampingFactor;
+            this.prevVel = velocity;
+        }
+        else {
+            velocity = this.prevVel;
+        }
+        velocity.x = THREE.MathUtils.clamp(velocity.x, -moveSpeed, moveSpeed);
+        velocity.z = THREE.MathUtils.clamp(velocity.z, -moveSpeed, moveSpeed);
         this.body.velocity = velocity;
-
-        this.engine.camera.position.copy(currentpos.vadd(new CANNON.Vec3(0, 1, 0)));
     }
+    
 }

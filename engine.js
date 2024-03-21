@@ -37,11 +37,11 @@ export class Engine {
     start() {
         this.isRunning = true;
         this.update();
-        setInterval(()=>{
+        setInterval(() => {
             this.fixedUpdate();
-        }, 1/60);
+        }, 1 / 60);
     }
-    fixedUpdate(){
+    fixedUpdate() {
         if (this.physicsWorld == null) return;
 
         this.physicsWorld.fixedStep();
@@ -258,47 +258,45 @@ export class GameObject {
 
     update(deltaTime) {
         this.components.forEach(component => {
-            try{
+
+            if (component.update) {
                 component.update(deltaTime);
-            }catch{
-                
             }
+
         });
         this.updatePhysics(deltaTime);
     }
 
     fixedUpdate() {
         this.components.forEach(component => {
-            try{
+            if (component.fixedUpdate) {
                 component.fixedUpdate();
-            }catch{
-                
             }
+
         });
     }
 
 
+
     addComponent(component) {
         this.components.push(component);
-        if(this.engine){
+        if (this.engine) {
             component.engine = this.engine;
             component.gameObject = this;
-            try{
-            component.start();
-            }catch{
+            try {
+                component.start();
+            } catch {
 
             }
         }
     }
-    
-    start(){
+
+    start() {
         this.components.forEach(component => {
             component.engine = this.engine;
             component.gameObject = this;
-            try{
+            if (component.start) {
                 component.start();
-            }catch(error){
-
             }
         });
     }
