@@ -53,8 +53,8 @@ export class Program {
         const planeShape = new CANNON.Box(new CANNON.Vec3(100, 1, 100));
         planeObject.initPhysicsBody(this.engine.physicsWorld, planeShape, 0.5, 1, 0);
         this.engine.csm.setupMaterial(planeMaterial);
-        planeObject.addComponent(new MeshComponent(planeGeometry, [planeMaterial], true, true));
         this.engine.addGameObject(planeObject);
+        planeObject.addComponent(new MeshComponent(planeGeometry, [planeMaterial], true, true));
 
     }
 
@@ -74,9 +74,10 @@ export class Program {
         cubeObject.setRotation(rotation.x, rotation.y, rotation.z);
         const cubeShape = new CANNON.Box(new CANNON.Vec3(1, 1, 1));
         cubeObject.initPhysicsBody(this.engine.physicsWorld, cubeShape, 0.5, 1, mass);
-        this.engine.csm.setupMaterial(cubeMaterial);
+        this.engine.csm.setupMaterial(cubeMaterial)
+        
+        this.engine.addGameObject(cubeObject);;
         cubeObject.addComponent(new MeshComponent(cubeGeometry, [cubeMaterial], true, true));
-        this.engine.addGameObject(cubeObject);
     }
 
     async addPlayer(position) {
@@ -91,7 +92,7 @@ export class Program {
         capsuleObject.addComponent(new MeshComponent(capsuleGeometry, [capsuleMaterial], true, true));
         this.engine.addGameObject(capsuleObject);
 
-        const _playerControls = new PlayerControls(this.engine, this.engine.camera, capsuleObject.physicsBody);
+        const _playerControls = new PlayerControls(capsuleObject.physicsBody);
         capsuleObject.addComponent(_playerControls);
 
     }

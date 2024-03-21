@@ -2,17 +2,12 @@ import * as THREE from '../node_modules/three/build/three.module.js';
 import * as CANNON from '../node_modules/cannon-es/dist/cannon-es.js';
 
 export class PlayerControls {
-    constructor(engine, camera, body, domElement) {
-        this.camera = camera;
-        this.engine = engine;
+    constructor(body) {
         this.body = body;
         this.body.angularFactor.set(0, 0, 0);
 
-        this.domElement = domElement || document;
-
         this.mouseX = 0;
         this.mouseY = 0;
-        this.init();
         this.mouseStopped = true;
         this.timer = null;
 
@@ -24,18 +19,12 @@ export class PlayerControls {
         this.moveSpeed = 20;
         this.rotX = 0;
         this.rotY = 0;
-
         this.grounded = false;
 
         this.jumpSpeed = 400;
         this.canJump = true;
     }
 
-    init() {
-        this.domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
-        window.addEventListener('keydown', this.onKeyDown.bind(this));
-        window.addEventListener('keyup', this.onKeyUp.bind(this));
-    }
 
     onMouseMove(event) {
         document.body.requestPointerLock();
@@ -97,6 +86,12 @@ export class PlayerControls {
         }
     }
 
+    start(){
+        document.addEventListener('mousemove', this.onMouseMove.bind(this));
+        document.addEventListener('keydown', this.onKeyDown.bind(this));
+        document.addEventListener('keyup', this.onKeyUp.bind(this));
+    }
+
     update(deltaTime) {
         const sensitivity = 0.5 * deltaTime;
         const deltaX = this.mouseX * sensitivity;
@@ -107,14 +102,15 @@ export class PlayerControls {
             this.rotX -= deltaY;
             this.rotX = THREE.MathUtils.clamp(this.rotX, -90 * Math.PI / 180, 90 * Math.PI / 180);
             const euler = new THREE.Euler(this.rotX, this.rotY, 0, 'YXZ');
-            this.camera.quaternion.setFromEuler(euler);
+            this.engine.camera.quaternion.setFromEuler(euler);
         }
 
         const moveDirection = new THREE.Vector3();
         const quaternion = new THREE.Quaternion();
-        this.camera.getWorldQuaternion(quaternion);
+        this.engine.camera.getWorldQuaternion(quaternion);
         moveDirection.set(0, 0, -1).applyQuaternion(quaternion);
 
+        
         const moveSpeed = this.moveSpeed;
         const moveForce = moveDirection.clone().multiplyScalar(moveSpeed);
 
@@ -148,6 +144,6 @@ export class PlayerControls {
         velocity.z *= dampingFactor * deltaTime;
         this.body.velocity = velocity;
 
-        this.camera.position.copy(currentpos.vadd(new CANNON.Vec3(0, 1, 0)));
+        this.engine.camera.position.copy(currentpos.vadd(new CANNON.Vec3(0, 1, 0)));
     }
 }

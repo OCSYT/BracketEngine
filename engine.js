@@ -99,8 +99,9 @@ export class Engine {
     }
 
     addGameObject(gameObject) {
+        gameObject.engine = this;
         this.gameObjects.push(gameObject);
-        gameObject.addToScene(this.scene);
+        gameObject.start();
     }
 
     removeGameObject(gameObject) {
@@ -173,6 +174,7 @@ export class GameObject {
         this.scale = { x: 1, y: 1, z: 1 };
         this.components = [];
         this.physicsBody = null;
+        this.hasstarted = false;
     }
 
     initPhysicsBody(physicsWorld, shape, restitution = 0.5, friction = 1, mass = 0) {
@@ -246,36 +248,38 @@ export class GameObject {
 
     update(deltaTime) {
         this.components.forEach(component => {
-            if (component.update) {
+            try{
                 component.update(deltaTime);
+            }catch{
+                
             }
         });
         this.updatePhysics(deltaTime);
     }
 
-    addToScene(scene) {
-        this.components.forEach(component => {
-            component.gameObject = this;
-            if (component.addToScene) {
-                component.addToScene(scene);
-            }
-            if (component.start) {
-                component.start();
-            }
-        });
-    }
-
-    removeFromScene(scene) {
-        this.components.forEach(component => {
-            if (component.removeFromScene) {
-                component.removeFromScene(scene);
-            }
-        });
-    }
-
     addComponent(component) {
-        component.gameObject = this;
         this.components.push(component);
+        if(this.engine){
+            component.engine = this.engine;
+            component.gameObject = this;
+            try{
+            component.start();
+            }catch{
+
+            }
+        }
+    }
+    
+    start(){
+        this.components.forEach(component => {
+            component.engine = this.engine;
+            component.gameObject = this;
+            try{
+                component.start();
+            }catch(error){
+
+            }
+        });
     }
 
     removeComponent(component) {
@@ -299,7 +303,7 @@ export class MeshComponent {
         this.recieveShadows = recieveShadows;
     }
 
-    addToScene(scene) {
+    start() {
         let index = 0;
         this.mesh.traverse((child) => {
             if (child instanceof THREE.Mesh && this.materials[index]) {
@@ -309,11 +313,11 @@ export class MeshComponent {
                 index++;
             }
         });
-        scene.add(this.mesh);
+        this.engine.scene.add(this.mesh);
     }
 
     removeFromScene(scene) {
-        scene.remove(this.mesh);
+        this.engine.scene.remove(this.mesh);
         delete this.mesh;
     }
 
