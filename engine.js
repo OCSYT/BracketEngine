@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 import * as CANNON from 'CANNON';
 import { CSM } from 'three/addons/csm/CSM.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
@@ -31,7 +32,7 @@ export class Engine {
         if (this.camera && !this.renderPass) {
             this.renderPass = new RenderPass(this.scene, this.camera);
             this.composer.addPass(this.renderPass);
-            this.moveRenderPass(this.composer, this.composer.passes.length-1)
+            this.moveRenderPass(this.composer, this.composer.passes.length - 1)
         }
     }
     moveRenderPass(composer, passIndex) {
@@ -40,10 +41,10 @@ export class Engine {
             console.error("Invalid pass index");
             return;
         }
-    
+
         // Remove the render pass from its current position
         const removedPass = composer.passes.splice(passIndex, 1)[0];
-    
+
         // Add the render pass to the start of the array
         composer.passes.unshift(removedPass);
     }
@@ -51,11 +52,12 @@ export class Engine {
     start() {
         this.isRunning = true;
         this.update();
-        setInterval(()=>{
+        setInterval(() => {
             this.fixedUpdate();
-        }, 1/60);
+            this.program.fixedUpdate();
+        }, 1 / 60);
     }
-    fixedUpdate(){
+    fixedUpdate() {
         if (this.physicsWorld == null) return;
 
         this.physicsWorld.fixedStep();
@@ -131,16 +133,30 @@ export class Engine {
 
     async loadMesh(url) {
         try {
-            const loader = new OBJLoader();
-            const object = await new Promise((resolve, reject) => {
-                loader.load(
-                    url,
-                    resolve,
-                    undefined,
-                    reject
-                );
-            });
-            return object;
+            if (url.includes("obj")) {
+                const loader = new OBJLoader();
+                const object = await new Promise((resolve, reject) => {
+                    loader.load(
+                        url,
+                        resolve,
+                        undefined,
+                        reject
+                    );
+                });
+                return object;
+            }
+            else{
+                const loader = new FBXLoader();
+                const object = await new Promise((resolve, reject) => {
+                    loader.load(
+                        url,
+                        resolve,
+                        undefined,
+                        reject
+                    );
+                });
+                return object;
+            }
         } catch (error) {
             console.error(`Error loading mesh: ${error}`);
             return null;
@@ -152,7 +168,7 @@ export class Engine {
         return shader;
     }
 
-    
+
 
     async loadTexture(url) {
         return new Promise((resolve, reject) => {
@@ -224,11 +240,11 @@ export class GameObject {
 
         for (let i = 0; i < this.components.length; i++) {
             const component = this.components[i];
-            
+
             if (component.onDestroy) {
                 component.onDestroy();
             }
-            
+
 
             component.engine = null;
             component.gameObject = null;
@@ -299,47 +315,47 @@ export class GameObject {
             this.rotation = { x: rot.x, y: rot.y, z: rot.z }
         }
     }
-    
+
     update(deltaTime) {
         this.components.forEach(component => {
 
-                if(component.update){
-                    component.update(deltaTime);
-                }
+            if (component.update) {
+                component.update(deltaTime);
+            }
 
         });
         this.updatePhysics(deltaTime);
     }
-    
+
     fixedUpdate() {
         this.components.forEach(component => {
-                if(component.fixedUpdate){
-                    component.fixedUpdate();
-                }
+            if (component.fixedUpdate) {
+                component.fixedUpdate();
+            }
 
         });
     }
-    
+
 
 
     addComponent(component) {
         this.components.push(component);
-        if(this.engine){
+        if (this.engine) {
             component.engine = this.engine;
             component.gameObject = this;
-            try{
-            component.start();
-            }catch{
+            try {
+                component.start();
+            } catch {
 
             }
         }
     }
-    
-    start(){
+
+    start() {
         this.components.forEach(component => {
             component.engine = this.engine;
             component.gameObject = this;
-            if(component.start){
+            if (component.start) {
                 component.start();
             }
         });
@@ -366,7 +382,7 @@ export class MeshComponent {
         this.recieveShadows = recieveShadows;
     }
 
-    onDestroy(){
+    onDestroy() {
         console.log("Removed");
         this.engine.scene.remove(this.mesh);
     }

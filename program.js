@@ -1,6 +1,5 @@
 import { Engine, GameObject, MeshComponent } from './engine.js';
 import * as THREE from 'three';
-import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import * as CANNON from 'CANNON';
 import { CSM } from 'three/addons/csm/CSM.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
@@ -57,10 +56,16 @@ export class Program {
         this.engine.csm.setupMaterial(planeMaterial);
         this.engine.addGameObject(planeObject);
         planeObject.addComponent(new MeshComponent(planeGeometry, [planeMaterial], true, true));
+
+        await this.AddGun();
     }
 
     async update(deltaTime) {
         document.getElementById("fps").innerHTML = "FPS: " + this.engine.currentFPS;
+    }
+
+    async fixedUpdate(){
+
     }
 
 
