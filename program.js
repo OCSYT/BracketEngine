@@ -3,8 +3,6 @@ import * as THREE from 'three';
 import * as CANNON from 'CANNON';
 import { CSM } from 'three/addons/csm/CSM.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-
 
 //post processing
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
