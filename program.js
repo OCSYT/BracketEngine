@@ -60,7 +60,7 @@ export class Program {
         await this.AddGun();
     }
 
-    async update(deltaTime) {
+    async update(deltaTime) {       
         document.getElementById("fps").innerHTML = "FPS: " + this.engine.currentFPS;
     }
 
@@ -96,8 +96,10 @@ export class Program {
         capsuleObject.initPhysicsBody(this.engine.physicsWorld, capsuleShape, 0, 0, 1);
         capsuleObject.physicsBody.collisionFilterGroup = 2;
         this.engine.csm.setupMaterial(capsuleMaterial);
-        capsuleObject.addComponent(new MeshComponent(capsuleGeometry, [capsuleMaterial], true, true));
+
         this.engine.addGameObject(capsuleObject);
+
+        capsuleObject.addComponent(new MeshComponent(capsuleGeometry, [capsuleMaterial], true, true));
 
         const _playerControls = new PlayerControls(capsuleObject.physicsBody);
         capsuleObject.addComponent(_playerControls);
