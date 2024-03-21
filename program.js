@@ -24,7 +24,7 @@ export class Program {
         const listener = new THREE.AudioListener();
         this.engine.camera.add( listener );
 
-
+        //lighting
         this.setupLighting();
         this.setupScene();
 
