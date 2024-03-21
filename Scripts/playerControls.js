@@ -158,10 +158,9 @@ export class PlayerControls {
             this.prevVel = velocity;
         }
         else {
-            velocity = this.prevVel;
+            velocity =  this.prevVel;
         }
-        velocity.x = THREE.MathUtils.clamp(velocity.x, -moveSpeed, moveSpeed);
-        velocity.z = THREE.MathUtils.clamp(velocity.z, -moveSpeed, moveSpeed);
+
         this.body.velocity = velocity;
     }
     
