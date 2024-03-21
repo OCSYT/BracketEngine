@@ -31,17 +31,31 @@ export class Engine {
         if (this.camera && !this.renderPass) {
             this.renderPass = new RenderPass(this.scene, this.camera);
             this.composer.addPass(this.renderPass);
+            this.moveRenderPass(this.composer, this.composer.passes.length-1)
         }
+    }
+    moveRenderPass(composer, passIndex) {
+        // Ensure passIndex is within bounds
+        if (passIndex < 0 || passIndex >= composer.passes.length) {
+            console.error("Invalid pass index");
+            return;
+        }
+    
+        // Remove the render pass from its current position
+        const removedPass = composer.passes.splice(passIndex, 1)[0];
+    
+        // Add the render pass to the start of the array
+        composer.passes.unshift(removedPass);
     }
 
     start() {
         this.isRunning = true;
         this.update();
-        setInterval(() => {
+        setInterval(()=>{
             this.fixedUpdate();
-        }, 1 / 60);
+        }, 1/60);
     }
-    fixedUpdate() {
+    fixedUpdate(){
         if (this.physicsWorld == null) return;
 
         this.physicsWorld.fixedStep();
@@ -103,7 +117,7 @@ export class Engine {
                 this.composer.setSize(window.innerWidth, window.innerHeight);
             }
             else {
-
+                this.startRendering();
             }
         }
     }
@@ -145,6 +159,7 @@ export class Engine {
         return shader;
     }
 
+    
 
     async loadTexture(url) {
         return new Promise((resolve, reject) => {
@@ -255,47 +270,47 @@ export class GameObject {
             this.rotation = { x: rot.x, y: rot.y, z: rot.z }
         }
     }
-
+    
     update(deltaTime) {
         this.components.forEach(component => {
 
-            if (component.update) {
-                component.update(deltaTime);
-            }
+                if(component.update){
+                    component.update(deltaTime);
+                }
 
         });
         this.updatePhysics(deltaTime);
     }
-
+    
     fixedUpdate() {
         this.components.forEach(component => {
-            if (component.fixedUpdate) {
-                component.fixedUpdate();
-            }
+                if(component.fixedUpdate){
+                    component.fixedUpdate();
+                }
 
         });
     }
-
+    
 
 
     addComponent(component) {
         this.components.push(component);
-        if (this.engine) {
+        if(this.engine){
             component.engine = this.engine;
             component.gameObject = this;
-            try {
-                component.start();
-            } catch {
+            try{
+            component.start();
+            }catch{
 
             }
         }
     }
-
-    start() {
+    
+    start(){
         this.components.forEach(component => {
             component.engine = this.engine;
             component.gameObject = this;
-            if (component.start) {
+            if(component.start){
                 component.start();
             }
         });

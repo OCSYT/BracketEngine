@@ -158,7 +158,7 @@ export class PlayerControls {
             this.prevVel = velocity;
         }
         else {
-            velocity =  this.prevVel;
+            velocity = this.prevVel;
         }
 
         this.body.velocity = velocity;

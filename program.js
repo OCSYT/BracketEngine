@@ -24,7 +24,9 @@ export class Program {
 
         //camera
         this.engine.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.5, 1000);
-        this.engine.startRendering();
+        const listener = new THREE.AudioListener();
+        this.engine.camera.add( listener );
+
 
         this.setupLighting();
         this.setupScene();
