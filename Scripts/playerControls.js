@@ -1,5 +1,5 @@
-import * as THREE from '../node_modules/three/build/three.module.js';
-import * as CANNON from '../node_modules/cannon-es/dist/cannon-es.js';
+import * as THREE from 'three';
+import * as CANNON from 'CANNON';
 
 export class PlayerControls {
     constructor(body) {
@@ -16,7 +16,7 @@ export class PlayerControls {
         this.moveLeft = false;
         this.moveRight = false;
 
-        this.moveSpeed = 20;
+        this.moveSpeed = 50;
         this.rotX = 0;
         this.rotY = 0;
         this.grounded = false;
@@ -91,8 +91,8 @@ export class PlayerControls {
         document.addEventListener('keydown', this.onKeyDown.bind(this));
         document.addEventListener('keyup', this.onKeyUp.bind(this));
     }
-
-    update(deltaTime) {
+    
+    update(deltaTime){
         const sensitivity = 0.5 * deltaTime;
         const deltaX = this.mouseX * sensitivity;
         const deltaY = this.mouseY * sensitivity;
@@ -103,18 +103,23 @@ export class PlayerControls {
             this.rotX = THREE.MathUtils.clamp(this.rotX, -90 * Math.PI / 180, 90 * Math.PI / 180);
             const euler = new THREE.Euler(this.rotX, this.rotY, 0, 'YXZ');
             this.engine.camera.quaternion.setFromEuler(euler);
+            this.gameObject.setRotation(0, this.rotY / 2, 0);
         }
 
+        this.engine.camera.position.copy(this.body.position.vadd(new CANNON.Vec3(0, 1, 0)));
+    }
+
+    fixedUpdate() {
+
         const moveDirection = new THREE.Vector3();
-        const quaternion = new THREE.Quaternion();
-        this.engine.camera.getWorldQuaternion(quaternion);
+        const quaternion =  new THREE.Quaternion(this.body.quaternion.x, this.body.quaternion.y, this.body.quaternion.z, this.body.quaternion.w);
         moveDirection.set(0, 0, -1).applyQuaternion(quaternion);
 
         
         const moveSpeed = this.moveSpeed;
         const moveForce = moveDirection.clone().multiplyScalar(moveSpeed);
 
-        var dampingFactor = 0.9;
+        var dampingFactor = .9;
         if (this.moveForward) {
             this.body.applyLocalForce(new CANNON.Vec3(moveForce.x, 0, moveForce.z), new CANNON.Vec3(0, 0, 0));
         }
@@ -140,8 +145,8 @@ export class PlayerControls {
         this.grounded = hit;
 
         const velocity = this.body.velocity;
-        velocity.x *= dampingFactor * deltaTime;
-        velocity.z *= dampingFactor * deltaTime;
+        velocity.x *= dampingFactor;
+        velocity.z *= dampingFactor;
         this.body.velocity = velocity;
 
         this.engine.camera.position.copy(currentpos.vadd(new CANNON.Vec3(0, 1, 0)));

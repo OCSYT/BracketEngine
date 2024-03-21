@@ -1,7 +1,7 @@
 import { Engine, GameObject, MeshComponent } from './engine.js';
 import * as THREE from 'three';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
-import * as CANNON from './node_modules/cannon-es/dist/cannon-es.js';
+import * as CANNON from 'CANNON';
 import { CSM } from 'three/addons/csm/CSM.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';

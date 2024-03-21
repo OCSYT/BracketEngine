@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
-import * as CANNON from './node_modules/cannon-es/dist/cannon-es.js';
+import * as CANNON from 'CANNON';
 import { CSM } from 'three/addons/csm/CSM.js';
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
@@ -37,7 +37,21 @@ export class Engine {
     start() {
         this.isRunning = true;
         this.update();
+        setInterval(()=>{
+            this.fixedUpdate();
+        }, 1/60);
     }
+    fixedUpdate(){
+        if (this.physicsWorld == null) return;
+
+        this.physicsWorld.fixedStep();
+
+        this.gameObjects.forEach(gameObject => {
+            gameObject.fixedUpdate();
+        });
+
+    }
+
 
     stop() {
         this.isRunning = false;
@@ -57,10 +71,6 @@ export class Engine {
             }
         }
 
-
-        if (this.physicsWorld == null) return;
-
-        this.physicsWorld.fixedStep();
 
         // Update game logic here
         this.gameObjects.forEach(gameObject => {
@@ -256,6 +266,17 @@ export class GameObject {
         });
         this.updatePhysics(deltaTime);
     }
+
+    fixedUpdate() {
+        this.components.forEach(component => {
+            try{
+                component.fixedUpdate();
+            }catch{
+                
+            }
+        });
+    }
+
 
     addComponent(component) {
         this.components.push(component);
