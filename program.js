@@ -32,8 +32,8 @@ export class Program {
         this.setupScene();
 
         //Cube
-        await this.AddCube(new THREE.Color(0, 0.5, 1), new THREE.Vector3(0, 5, 0), new THREE.Vector3(), 1);
-        await this.AddCube(new THREE.Color(1, 0, 0), new THREE.Vector3(5, 5, -5), new THREE.Vector3(1, 2, 1), 1);
+        await this.AddCube(new THREE.Color(0, 0.5, 1), new THREE.Vector3(0, 5, 0), new THREE.Vector3(), new THREE.Vector3(1,1,1), 1);
+        await this.AddCube(new THREE.Color(1, 0, 0), new THREE.Vector3(5, 5, -5), new THREE.Vector3(1, 2, 1), new THREE.Vector3(1,1,1), 1);
 
 
         //player
@@ -64,7 +64,7 @@ export class Program {
     }
 
 
-    async AddCube(color, position, rotation, mass) {
+    async AddCube(color, position, rotation, scale, mass) {
         const cubeGeometry = await this.engine.loadMesh("./Models/Primitive/cube.obj");
         const cubeMaterial = new THREE.MeshStandardMaterial();
         const cubeTex = await this.engine.loadTexture("./Textures/Required/Checkerboard.png");
@@ -73,6 +73,7 @@ export class Program {
         const cubeObject = new GameObject();
         cubeObject.setPosition(position.x, position.y, position.z);
         cubeObject.setRotation(rotation.x, rotation.y, rotation.z);
+        cubeObject.setScale(scale.x, scale.y, scale.z);
         const cubeShape = new CANNON.Box(new CANNON.Vec3(1, 1, 1));
         cubeObject.initPhysicsBody(this.engine.physicsWorld, cubeShape, 0.5, 1, mass);
         this.engine.csm.setupMaterial(cubeMaterial)
