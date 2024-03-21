@@ -57,7 +57,6 @@ export class Program {
         this.engine.csm.setupMaterial(planeMaterial);
         this.engine.addGameObject(planeObject);
         planeObject.addComponent(new MeshComponent(planeGeometry, [planeMaterial], true, true));
-
     }
 
     async update(deltaTime) {
@@ -111,7 +110,7 @@ export class Program {
         let csm = new CSM({
             maxFar: 250,
             cascades: 4,
-            shadowMapSize: 2024,
+            shadowMapSize: 1028,
             lightDirection: new THREE.Vector3(1, -1, 1).normalize(),
             camera: this.engine.camera,
             parent: this.engine.scene,

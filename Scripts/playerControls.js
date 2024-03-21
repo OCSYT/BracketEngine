@@ -93,6 +93,12 @@ export class PlayerControls {
         document.addEventListener('keydown', this.onKeyDown.bind(this));
         document.addEventListener('keyup', this.onKeyUp.bind(this));
     }
+    
+    onDestroy() {
+        document.removeEventListener('mousemove', this.onMouseMove.bind(this));
+        document.removeEventListener('keydown', this.onKeyDown.bind(this));
+        document.removeEventListener('keyup', this.onKeyUp.bind(this));
+    }
 
     update(deltaTime) {
         const sensitivity = 0.5 * deltaTime;

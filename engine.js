@@ -128,13 +128,6 @@ export class Engine {
         gameObject.start();
     }
 
-    removeGameObject(gameObject) {
-        const index = this.gameObjects.indexOf(gameObject);
-        if (index !== -1) {
-            this.gameObjects.splice(index, 1);
-            gameObject.removeFromScene(this.scene);
-        }
-    }
 
     async loadMesh(url) {
         try {
@@ -225,6 +218,42 @@ export class GameObject {
         this.physicsBody = body;
 
         physicsWorld.addBody(body);
+    }
+
+    destroy() {
+
+        for (let i = 0; i < this.components.length; i++) {
+            const component = this.components[i];
+            
+            if (component.onDestroy) {
+                component.onDestroy();
+            }
+            
+
+            component.engine = null;
+            component.gameObject = null;
+
+            const index = this.components.indexOf(component);
+            if (index !== -1) {
+                this.components.splice(index, 1);
+                console.log(this.components);
+                i--;
+            }
+        }
+
+        const index = this.engine.gameObjects.indexOf(this);
+        if (index !== -1) {
+            this.engine.gameObjects.splice(index, 1);
+        }
+
+        if (this.physicsBody && this.physicsBody.world) {
+            this.physicsBody.world.removeBody(this.physicsBody);
+        }
+
+
+        this.physicsBody = null;
+
+        this.hasStarted = false;
     }
 
 
@@ -337,6 +366,11 @@ export class MeshComponent {
         this.recieveShadows = recieveShadows;
     }
 
+    onDestroy(){
+        console.log("Removed");
+        this.engine.scene.remove(this.mesh);
+    }
+
     start() {
         let index = 0;
         this.mesh.traverse((child) => {
@@ -350,10 +384,6 @@ export class MeshComponent {
         this.engine.scene.add(this.mesh);
     }
 
-    removeFromScene(scene) {
-        this.engine.scene.remove(this.mesh);
-        delete this.mesh;
-    }
 
     update(deltaTime) {
         if (this.gameObject) {
