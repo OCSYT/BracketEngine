@@ -28,6 +28,9 @@ export class Program {
         this.setupLighting();
         this.setupScene();
 
+        //ground
+        await this.AddGround();
+
         //Cube
         await this.AddCube(new THREE.Color(0, 0.5, 1), new THREE.Vector3(0, 5, 0), new THREE.Vector3(), new THREE.Vector3(1,1,1), 1);
         await this.AddCube(new THREE.Color(1, 0, 0), new THREE.Vector3(5, 5, -5), new THREE.Vector3(1, 2, 1), new THREE.Vector3(1,1,1), 1);
@@ -36,7 +39,17 @@ export class Program {
         //player
         await this.addPlayer(new THREE.Vector3(0, 5, 5));
 
-        //ground
+    }
+
+    async update(deltaTime) {       
+        document.getElementById("fps").innerHTML = "FPS: " + this.engine.currentFPS;
+    }
+
+    async fixedUpdate(){
+
+    }
+
+    async AddGround(){
         const planeGeometry = await this.engine.loadMesh("./Models/Primitive/cube.obj");
         const planeMaterial = new THREE.MeshStandardMaterial();
         const planeTex = await this.engine.loadTexture("./Textures/Required/Checkerboard.png");
@@ -54,18 +67,7 @@ export class Program {
         this.engine.csm.setupMaterial(planeMaterial);
         this.engine.addGameObject(planeObject);
         planeObject.addComponent(new MeshComponent(planeGeometry, [planeMaterial], true, true));
-
-        await this.AddGun();
     }
-
-    async update(deltaTime) {       
-        document.getElementById("fps").innerHTML = "FPS: " + this.engine.currentFPS;
-    }
-
-    async fixedUpdate(){
-
-    }
-
 
     async AddCube(color, position, rotation, scale, mass) {
         const cubeGeometry = await this.engine.loadMesh("./Models/Primitive/cube.obj");
