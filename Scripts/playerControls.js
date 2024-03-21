@@ -144,11 +144,11 @@ export class PlayerControls {
         }
 
         const currentpos = new CANNON.Vec3(this.gameObject.position.x, this.gameObject.position.y, this.gameObject.position.z);
+
+
         const raycastOptions = {
             collisionFilterMask: ~this.body.collisionFilterGroup
         };
-
-
 
         let hit = false;
         this.engine.physicsWorld.raycastAll(currentpos, currentpos.vadd(new CANNON.Vec3(0, -2, 0)), raycastOptions, (raycastResult) => {
