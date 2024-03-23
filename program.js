@@ -36,20 +36,20 @@ export class Program {
 
 
         //player
-        await this.addPlayer(new THREE.Vector3(0, 5, 5));
+        const player = await this.addPlayer(new THREE.Vector3(0, 5, 5));
 
 
-        await this.addGun();
+        await this.addGun(player);
     }
 
-    async addGun(){
+    async addGun(playerControls){
         const gunObj = new GameObject();
         this.engine.addGameObject(gunObj);
         const gunGeometry = await this.engine.loadMesh("./Models/Weapon_Mesh_SK.obj");
         const gunMat = new THREE.MeshStandardMaterial();
         gunMat.map = await this.engine.loadTexture("./Textures/gun.png");
         gunObj.addComponent(new MeshComponent(gunGeometry, [gunMat]));
-        gunObj.addComponent(new gun(gunObj));
+        gunObj.addComponent(new gun(gunObj, playerControls));
     }
 
     async update(deltaTime) {       
@@ -114,7 +114,7 @@ export class Program {
 
         const _playerControls = new PlayerControls(capsuleObject.physicsBody);
         capsuleObject.addComponent(_playerControls);
-
+        return _playerControls;
     }
 
 

@@ -1,6 +1,8 @@
 const { app, BrowserWindow, screen, remote, ipcMain, Menu, globalShortcut } = require('electron');
 const path = require('path');
-// Create the browser window
+
+
+
 function createWindow() {
   const mainWindow = new BrowserWindow({
     width: 800,
@@ -16,7 +18,6 @@ function createWindow() {
   // Load the index.html file
   mainWindow.loadFile('index.html');
 
-  app.commandLine.appendSwitch('disable-frame-rate-limit');
 
   const template = [
     {
@@ -45,6 +46,5 @@ function createWindow() {
   });
 
 }
-
 
 app.whenReady().then(createWindow);

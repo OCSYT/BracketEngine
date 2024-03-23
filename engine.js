@@ -28,6 +28,16 @@ export class Engine {
 
     }
 
+    getGameObjectByBody(physicsBody) {
+        for (const obj of this.gameObjects) {
+            if (obj.physicsBody && obj.physicsBody.id === physicsBody.id) {
+                return obj;
+            }
+        }
+        return null;
+    }
+    
+
     startRendering() {
         if (this.camera && !this.renderPass) {
             this.renderPass = new RenderPass(this.scene, this.camera);

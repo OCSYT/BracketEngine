@@ -6,7 +6,7 @@ export class PlayerControls {
         this.body = body;
         this.body.angularFactor.set(0, 0, 0);
 
-        this.sensitivity = 10;
+        this.sensitivity = 1;
         this.mouseX = 0;
         this.mouseY = 0;
         this.mouseStopped = true;
