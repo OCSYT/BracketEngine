@@ -5,3 +5,14 @@ body {
     color: rgb(0, 0, 0);
     font-family: 'Open Sans';
 }
+.crosshair {
+    height: 7.5px;
+    width: 7.5px;
+    background-color: #000000;
+    border: solid rgb(255, 255, 255) 2px;
+    border-radius: 50%;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
