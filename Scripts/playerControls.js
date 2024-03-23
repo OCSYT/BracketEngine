@@ -17,12 +17,12 @@ export class PlayerControls {
         this.moveLeft = false;
         this.moveRight = false;
 
-        this.moveSpeed = 50;
+        this.moveSpeed = 150;
         this.rotX = 0;
         this.rotY = 0;
         this.grounded = false;
 
-        this.jumpSpeed = 400;
+        this.jumpSpeed = 300;
         this.canJump = true;
 
         this.prevVel = new CANNON.Vec3();
@@ -81,7 +81,7 @@ export class PlayerControls {
 
     jump() {
         if (this.canJump && this.grounded) {
-            this.body.applyForce(new CANNON.Vec3(0, this.jumpSpeed, 0));
+            this.body.applyForce(new CANNON.Vec3(0, this.jumpSpeed * 100, 0));
             this.canJump = false;
             setTimeout(() => {
                 this.canJump = true;
@@ -125,10 +125,10 @@ export class PlayerControls {
         moveDirection.set(0, 0, -1).applyQuaternion(quaternion);
 
 
-        const moveSpeed = this.moveSpeed;
+        const moveSpeed = this.moveSpeed * 100;
         const moveForce = moveDirection.clone().multiplyScalar(moveSpeed);
 
-        var dampingFactor = .9;
+        var dampingFactor = .75;
         if (this.grounded) {
             if (this.moveForward) {
                 this.body.applyLocalForce(new CANNON.Vec3(moveForce.x, 0, moveForce.z), new CANNON.Vec3(0, 0, 0));

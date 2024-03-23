@@ -31,8 +31,8 @@ export class Program {
         await this.AddGround();
 
         //Cube
-        await this.AddCube(new THREE.Color(0, 0.5, 1), new THREE.Vector3(0, 5, 0), new THREE.Vector3(), new THREE.Vector3(1,1,1), 1);
-        await this.AddCube(new THREE.Color(1, 0, 0), new THREE.Vector3(5, 5, -5), new THREE.Vector3(1, 2, 1), new THREE.Vector3(1,1,1), 1);
+        await this.AddCube(new THREE.Color(0, 0.5, 1), new THREE.Vector3(0, 5, 0), new THREE.Vector3(), new THREE.Vector3(1,1,1), 50);
+        await this.AddCube(new THREE.Color(1, 0, 0), new THREE.Vector3(5, 5, -5), new THREE.Vector3(1, 2, 1), new THREE.Vector3(1,1,1), 50);
 
 
         //player
@@ -104,7 +104,7 @@ export class Program {
         const capsuleObject = new GameObject();
         capsuleObject.setPosition(position.x, position.y, position.z);
         const capsuleShape = new CANNON.Cylinder(1, 1, 4, 16);
-        capsuleObject.initPhysicsBody(this.engine.physicsWorld, capsuleShape, 0, 0, 1);
+        capsuleObject.initPhysicsBody(this.engine.physicsWorld, capsuleShape, 0, 0, 70);
         capsuleObject.physicsBody.collisionFilterGroup = 2;
         this.engine.csm.setupMaterial(capsuleMaterial);
 

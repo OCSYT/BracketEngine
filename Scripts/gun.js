@@ -9,7 +9,7 @@ export class gun {
         this.recoil = 10;
         this.currentRot = 0;
         this.distance = 500;
-        this.force = 500;
+        this.force = 50000;
     }
 
     start(){
