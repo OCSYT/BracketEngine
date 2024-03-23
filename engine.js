@@ -55,12 +55,11 @@ export class Engine {
         setInterval(() => {
             this.fixedUpdate();
             this.program.fixedUpdate();
-        }, 1 / 60);
+        }, 1000 / 60);
     }
     fixedUpdate() {
         if (this.physicsWorld == null) return;
 
-        this.physicsWorld.fixedStep();
 
         this.gameObjects.forEach(gameObject => {
             gameObject.fixedUpdate();
@@ -76,6 +75,8 @@ export class Engine {
     update() {
         if (!this.isRunning) return;
 
+        this.physicsWorld.fixedStep();
+        
         const currentTime = performance.now();
 
         const deltaTime = this.clock.getDelta();
@@ -84,6 +85,10 @@ export class Engine {
         if (this.camera) {
             if (this.csm) {
                 this.csm.update(this.camera.matrix);
+            }
+            if(!this.listener){
+                this.listener = new THREE.AudioListener();
+                this.camera.add( this.listener );
             }
         }
 
@@ -252,7 +257,6 @@ export class GameObject {
             const index = this.components.indexOf(component);
             if (index !== -1) {
                 this.components.splice(index, 1);
-                console.log(this.components);
                 i--;
             }
         }
@@ -274,12 +278,10 @@ export class GameObject {
 
 
     setPosition(x, y, z) {
-        if (!this.physicsBody) {
-            this.position.x = x;
-            this.position.y = y;
-            this.position.z = z;
-        }
-        else {
+        this.position.x = x;
+        this.position.y = y;
+        this.position.z = z;
+        if (this.physicsBody) {
             this.physicsBody.x = x;
             this.physicsBody.y = y;
             this.physicsBody.z = z;
@@ -298,6 +300,53 @@ export class GameObject {
             this.physicsBody.quaternion = initialQuaternion;
         }
     }
+
+    rotateLocalX(angle) {
+        if (!this.physicsBody) {
+            const currentRotationQuaternion = new THREE.Quaternion().setFromEuler(new THREE.Euler(this.rotation.x, this.rotation.y, this.rotation.z, 'XYZ'));
+            const localXRotationQuaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), angle);
+            const newRotationQuaternion = currentRotationQuaternion.multiply(localXRotationQuaternion);
+            const euler = new THREE.Euler().setFromQuaternion(newRotationQuaternion);
+            this.rotation.x = euler.x;
+            this.rotation.y = euler.y;
+            this.rotation.z = euler.z;
+        } else {
+            const rotationQuaternion = new CANNON.Quaternion().setFromEuler(angle, 0, 0, 'XYZ');
+            this.physicsBody.quaternion = rotationQuaternion.mult(this.physicsBody.quaternion);
+        }
+    }
+    
+    rotateLocalY(angle) {
+        if (!this.physicsBody) {
+            const currentRotationQuaternion = new THREE.Quaternion().setFromEuler(new THREE.Euler(this.rotation.x, this.rotation.y, this.rotation.z, 'XYZ'));
+            const localYRotationQuaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), angle);
+            const newRotationQuaternion = currentRotationQuaternion.multiply(localYRotationQuaternion);
+            const euler = new THREE.Euler().setFromQuaternion(newRotationQuaternion);
+            this.rotation.x = euler.x;
+            this.rotation.y = euler.y;
+            this.rotation.z = euler.z;
+        } else {
+            const rotationQuaternion = new CANNON.Quaternion().setFromEuler(0, angle, 0, 'XYZ');
+            this.physicsBody.quaternion = rotationQuaternion.mult(this.physicsBody.quaternion);
+        }
+    }
+    
+    rotateLocalZ(angle) {
+        if (!this.physicsBody) {
+            const currentRotationQuaternion = new THREE.Quaternion().setFromEuler(new THREE.Euler(this.rotation.x, this.rotation.y, this.rotation.z, 'XYZ'));
+            const localZRotationQuaternion = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), angle);
+            const newRotationQuaternion = currentRotationQuaternion.multiply(localZRotationQuaternion);
+            const euler = new THREE.Euler().setFromQuaternion(newRotationQuaternion);
+            this.rotation.x = euler.x;
+            this.rotation.y = euler.y;
+            this.rotation.z = euler.z;
+        } else {
+            const rotationQuaternion = new CANNON.Quaternion().setFromEuler(0, 0, angle, 'XYZ');
+            this.physicsBody.quaternion = rotationQuaternion.mult(this.physicsBody.quaternion);
+        }
+    }
+
+    
 
     setScale(x, y, z) {
         this.scale.x = x;
@@ -383,7 +432,6 @@ export class MeshComponent {
     }
 
     onDestroy() {
-        console.log("Removed");
         this.engine.scene.remove(this.mesh);
     }
 

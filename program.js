@@ -10,6 +10,7 @@ import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 
 //custom scripts
 import { PlayerControls } from './Scripts/playerControls.js';
+import { gun } from "./Scripts/gun.js";
 
 export class Program {
     constructor() {
@@ -20,9 +21,7 @@ export class Program {
     async start() {
 
         //camera
-        this.engine.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.5, 1000);
-        const listener = new THREE.AudioListener();
-        this.engine.camera.add( listener );
+        this.engine.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
         //lighting
         this.setupLighting();
@@ -39,14 +38,26 @@ export class Program {
         //player
         await this.addPlayer(new THREE.Vector3(0, 5, 5));
 
+
+        await this.addGun();
+    }
+
+    async addGun(){
+        const gunObj = new GameObject();
+        this.engine.addGameObject(gunObj);
+        const gunGeometry = await this.engine.loadMesh("./Models/Weapon_Mesh_SK.obj");
+        const gunMat = new THREE.MeshStandardMaterial();
+        gunMat.map = await this.engine.loadTexture("./Textures/gun.png");
+        gunObj.addComponent(new MeshComponent(gunGeometry, [gunMat]));
+        gunObj.addComponent(new gun(gunObj));
     }
 
     async update(deltaTime) {       
-        document.getElementById("fps").innerHTML = "FPS: " + this.engine.currentFPS;
+    
     }
 
     async fixedUpdate(){
-
+        document.getElementById("fps").innerHTML = "FPS: " + this.engine.currentFPS;
     }
 
     async AddGround(){
@@ -149,7 +160,7 @@ export class Program {
 
         this.engine.composer.addPass(AO);
         const aoParameters = {
-            radius: 0.25,
+            radius: 1,
             distanceExponent: 1.,
             thickness: 1.,
             scale: 5.,
@@ -172,8 +183,8 @@ export class Program {
 
         //bloom
         const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
-        bloomPass.threshold = 0;
-        bloomPass.strength = .1;
+        bloomPass.threshold = .5;
+        bloomPass.strength = .25;
         bloomPass.radius = 0;
         this.engine.composer.addPass(bloomPass);
 

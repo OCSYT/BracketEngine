@@ -6,6 +6,7 @@ export class PlayerControls {
         this.body = body;
         this.body.angularFactor.set(0, 0, 0);
 
+        this.sensitivity = 10;
         this.mouseX = 0;
         this.mouseY = 0;
         this.mouseStopped = true;
@@ -101,7 +102,7 @@ export class PlayerControls {
     }
 
     update(deltaTime) {
-        const sensitivity = 0.5 * deltaTime;
+        const sensitivity = this.sensitivity / 10 * deltaTime;
         const deltaX = this.mouseX * sensitivity;
         const deltaY = this.mouseY * sensitivity;
 
@@ -147,14 +148,12 @@ export class PlayerControls {
 
 
         const raycastOptions = {
-            collisionFilterMask: ~this.body.collisionFilterGroup
+            collisionFilterMask: ~2
         };
 
-        let hit = false;
-        this.engine.physicsWorld.raycastAll(currentpos, currentpos.vadd(new CANNON.Vec3(0, -2, 0)), raycastOptions, (raycastResult) => {
-            hit = true;
-        });
-        this.grounded = hit;
+        const result = new CANNON.RaycastResult();
+        this.engine.physicsWorld.raycastClosest(currentpos, currentpos.vadd(new CANNON.Vec3(0, -2, 0)), raycastOptions, result);
+        this.grounded = result.hasHit;
 
         let velocity = null;
         if (this.grounded) {
