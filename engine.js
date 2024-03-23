@@ -66,7 +66,7 @@ export class Engine {
 
         if (this.physicsWorld == null) return;
 
-        this.physicsWorld.fixedStep();
+        this.physicsWorld.step(1/60);
 
 
     }
