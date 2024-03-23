@@ -76,8 +76,8 @@ export class gun {
         }
     }
 
-    update(deltaTime){
-        this.currentRot -= 75 * deltaTime * Math.PI / 180 ;
+    fixedUpdate(){
+        this.currentRot -= 75 * 0.01 * Math.PI / 180 ;
         this.currentRot = THREE.MathUtils.clamp(this.currentRot, 0, this.recoil * Math.PI / 180);
         if(this.engine.camera && this.gunObj){
             const camRot = this.engine.camera.rotation;

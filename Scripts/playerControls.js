@@ -102,6 +102,7 @@ export class PlayerControls {
     }
 
     update(deltaTime) {
+        if(this.engine.camera == null) return;
         const sensitivity = this.sensitivity / 10 * deltaTime;
         const deltaX = this.mouseX * sensitivity;
         const deltaY = this.mouseY * sensitivity;
@@ -114,12 +115,11 @@ export class PlayerControls {
             this.engine.camera.quaternion.setFromEuler(euler);
             this.gameObject.setRotation(0, this.rotY / 2, 0);
         }
-
-        this.engine.camera.position.copy(this.body.position.vadd(new CANNON.Vec3(0, 1, 0)));
     }
 
     fixedUpdate() {
 
+        if(this.engine.camera == null) return;
         const moveDirection = new THREE.Vector3();
         const quaternion = new THREE.Quaternion(this.body.quaternion.x, this.body.quaternion.y, this.body.quaternion.z, this.body.quaternion.w);
         moveDirection.set(0, 0, -1).applyQuaternion(quaternion);
@@ -146,7 +146,6 @@ export class PlayerControls {
 
         const currentpos = new CANNON.Vec3(this.gameObject.position.x, this.gameObject.position.y, this.gameObject.position.z);
 
-
         const raycastOptions = {
             collisionFilterMask: ~2
         };
@@ -167,6 +166,9 @@ export class PlayerControls {
         }
 
         this.body.velocity = velocity;
+
+
+        this.engine.camera.position.copy(currentpos.vadd(new CANNON.Vec3(0, 1, 0)));
     }
     
 }

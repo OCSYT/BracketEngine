@@ -58,12 +58,16 @@ export class Engine {
         }, 1000 / 60);
     }
     fixedUpdate() {
-        if (this.physicsWorld == null) return;
 
-
+        
         this.gameObjects.forEach(gameObject => {
             gameObject.fixedUpdate();
         });
+
+        if (this.physicsWorld == null) return;
+
+        this.physicsWorld.fixedStep();
+
 
     }
 
@@ -75,8 +79,6 @@ export class Engine {
     update() {
         if (!this.isRunning) return;
 
-        this.physicsWorld.fixedStep();
-        
         const currentTime = performance.now();
 
         const deltaTime = this.clock.getDelta();
