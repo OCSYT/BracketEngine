@@ -10,7 +10,7 @@ import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
 
 //custom scripts
 import { PlayerControls } from './Scripts/playerControls.js';
-import { gun } from "./Scripts/gun.js";
+import { Gun } from "./Scripts/gun.js";
 
 export class Program {
     constructor() {
@@ -45,11 +45,13 @@ export class Program {
     async addGun(playerControls){
         const gunObj = new GameObject();
         this.engine.addGameObject(gunObj);
-        const gunGeometry = await this.engine.loadMesh("./Models/Weapon_Mesh_SK.obj");
+        gunObj.setScale(0.02, 0.02, 0.02);
+        const gunGeometry = await this.engine.loadMesh("./Models/Gun.obj");
         const gunMat = new THREE.MeshStandardMaterial();
-        gunMat.map = await this.engine.loadTexture("./Textures/gun.png");
+        gunMat.map = await this.engine.loadTexture("./Textures/Gun.png");
+        this.engine.csm.setupMaterial(gunMat);
         gunObj.addComponent(new MeshComponent(gunGeometry, [gunMat]));
-        gunObj.addComponent(new gun(gunObj, playerControls));
+        gunObj.addComponent(new Gun(gunObj, playerControls, "Assault Rifle"));
     }
 
     async update(deltaTime) {       
@@ -183,7 +185,7 @@ export class Program {
 
         //bloom
         const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
-        bloomPass.threshold = .5;
+        bloomPass.threshold = .75;
         bloomPass.strength = .25;
         bloomPass.radius = 0;
         this.engine.composer.addPass(bloomPass);

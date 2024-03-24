@@ -3,33 +3,62 @@ import { GameObject, MeshComponent, Engine } from '../engine.js';
 import * as CANNON from "CANNON";
 
 
-export class gun {
-    constructor(gunObj, player) {
+export class Gun {
+    constructor(gunObj, player, gunName, options = {}) {
+        // Required parameters
+        this.gunName = gunName;
         this.gunObj = gunObj;
         this.player = player;
-        this.recoil = 10;
-        this.currentRot = 0;
-        this.distance = 500;
-        this.force = 50000;
-        this.rotSmoothing = 10;
+
+        // Default options
+        const {
+            bobStrength = 0.05,
+            recoilDirection = -1,
+            recoil = 10,
+            currentRot = 0,
+            distance = 500,
+            force = 50000,
+            rotSmoothing = 15,
+            fireRate = 100,
+            reloadRate = 2500,
+            maxAmmo = 30,
+            singleshot = false,
+            damage = 30,
+            offset = new THREE.Vector3(.15, -.3, -.6),
+            rotOffset = new THREE.Euler(0, 180 * Math.PI / 180, 0)
+        } = options;
+
+        // Assign options
+        this.bobStrength = bobStrength;
+        this.recoilDirection = recoilDirection;
+        this.recoil = recoil;
+        this.currentRot = currentRot;
+        this.distance = distance;
+        this.force = force;
+        this.rotSmoothing = rotSmoothing;
+        this.fireRate = fireRate;
+        this.reloadRate = reloadRate;
+        this.maxAmmo = maxAmmo;
+        this.singleshot = singleshot;
+        this.damage = damage;
+        this.offset = offset;
+        this.rotOffset = rotOffset;
+
+        // Default states
         this.camRot = new THREE.Quaternion();
         this.bobx = 0;
         this.boby = 0;
         this.shooting = false;
         this.allowShoot = true;
-        this.fireRate = 100;
-
         this.reloading = false;
-        this.reloadRate = 2500;
-
-        this.maxAmmo = 30;
-        this.ammo;
+        this.ammo = maxAmmo;
         this.reloadOffset = 0;
     }
 
+
+
     start() {
         this.ammo = this.maxAmmo;
-        this.gunObj.setScale(0.1, 0.1, 0.1);
         document.addEventListener("mousedown", this.onMouseDown.bind(this));
         document.addEventListener("mouseup", this.onMouseUp.bind(this));
         document.addEventListener('keydown', this.onKeyDown.bind(this));
@@ -37,9 +66,9 @@ export class gun {
     }
 
     onKeyDown(event) {
-        if(event.key == "r" && !this.reloading){
+        if (event.key == "r" && !this.reloading) {
             this.reloading = true;
-            setTimeout(()=>{
+            setTimeout(() => {
                 this.reloading = false;
             }, this.reloadRate);
         }
@@ -49,11 +78,21 @@ export class gun {
     }
     onMouseDown(event) {
         if (event.button != 0) return;
-        this.shooting = true;
+        if(!this.singleshot){
+            this.shooting = true;
+        }
+        else{
+            this.shooting = true;
+            setTimeout(()=>{
+                this.shooting = false;
+            }, this.fireRate);
+        }
     }
     onMouseUp(event) {
         if (event.button != 0) return;
-        this.shooting = false;
+        if(!this.singleshot){
+            this.shooting = false;
+        }
     }
 
     async createSphere(position) {
@@ -118,19 +157,21 @@ export class gun {
 
     fixedUpdate() {
 
-        document.getElementById("guninfo").innerHTML = this.ammo + "/" + this.maxAmmo;
+        document.getElementById("guninfo").innerHTML =
+            this.gunName + ": " +
+            this.ammo + "/" + this.maxAmmo;
 
         if (this.shooting === true && this.allowShoot === true && !this.reloading) {
-            if(this.ammo >= 1){
+            if (this.ammo >= 1) {
                 this.shoot();
             }
         }
 
-        if(this.reloading){
+        if (this.reloading) {
             this.ammo = this.maxAmmo;
             this.reloadOffset = THREE.MathUtils.lerp(this.reloadOffset, -3, 5 * 0.02);
         }
-        else{
+        else {
             this.reloadOffset = THREE.MathUtils.lerp(this.reloadOffset, 0, 5 * 0.02);
         }
 
@@ -145,7 +186,7 @@ export class gun {
                 const playerspeed = Math.round(Math.abs(THREE.MathUtils.clamp(this.player.body.velocity.x * 2 + this.player.body.velocity.z * 4, -1, 1)));
 
                 if (this.player.grounded) {
-                    const bobangle = 0.1;
+                    const bobangle = this.bobStrength;
                     const bobspeed = 1;
 
                     this.bobx = THREE.MathUtils.lerp(this.bobx, Math.sin(playerspeed * Date.now() / 100 * bobspeed) * bobangle, 5 * 0.02);
@@ -157,9 +198,9 @@ export class gun {
                 }
             }
 
-            const gunOffset = new THREE.Vector3(.15 + this.bobx, -.4 - this.boby +   this.reloadOffset, -.6);
-            gunOffset.applyQuaternion(this.engine.camera.quaternion.clone());
-            gunPos = gunPos.add(gunOffset);
+            const offset = this.offset.clone().add(new THREE.Vector3(this.bobx, this.boby +  this.reloadOffset));
+            offset.applyQuaternion(this.engine.camera.quaternion.clone());
+            gunPos = gunPos.add(offset);
 
             this.gunObj.setPosition(gunPos.x, gunPos.y, gunPos.z);
 
@@ -167,7 +208,10 @@ export class gun {
 
             let gunRot = new THREE.Euler().setFromQuaternion(this.camRot);
             this.gunObj.setRotation(gunRot.x, gunRot.y, gunRot.z);
-            this.gunObj.rotateLocalX(this.currentRot);
+            this.gunObj.rotateLocalX(this.rotOffset.x);
+            this.gunObj.rotateLocalY(this.rotOffset.y);
+            this.gunObj.rotateLocalZ(this.rotOffset.z);
+            this.gunObj.rotateLocalX(this.currentRot * this.recoilDirection);
 
 
 
