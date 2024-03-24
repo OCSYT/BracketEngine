@@ -254,7 +254,6 @@ export class GameObject {
     }
 
     destroy() {
-
         for (let i = 0; i < this.components.length; i++) {
             const component = this.components[i];
 
@@ -273,17 +272,18 @@ export class GameObject {
             }
         }
 
+        if (this.physicsBody && this.physicsBody.world) {
+            this.physicsBody.world.removeBody(this.physicsBody);
+            this.physicsBody = null;
+        }
+
+
+
         const index = this.engine.gameObjects.indexOf(this);
         if (index !== -1) {
             this.engine.gameObjects.splice(index, 1);
         }
 
-        if (this.physicsBody && this.physicsBody.world) {
-            this.physicsBody.world.removeBody(this.physicsBody);
-        }
-
-
-        this.physicsBody = null;
 
         this.hasStarted = false;
     }
