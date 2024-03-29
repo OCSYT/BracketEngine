@@ -90,15 +90,19 @@ export class PlayerControls {
     }
 
     start() {
-        document.addEventListener('mousemove', this.onMouseMove.bind(this));
-        document.addEventListener('keydown', this.onKeyDown.bind(this));
-        document.addEventListener('keyup', this.onKeyUp.bind(this));
+        this.boundOnMouseMove = this.onMouseMove.bind(this);
+        this.boundOnKeyDown = this.onKeyDown.bind(this);
+        this.boundOnKeyUp = this.onKeyUp.bind(this);
+
+        document.addEventListener('mousemove', this.boundOnMouseMove);
+        document.addEventListener('keydown', this.boundOnKeyDown);
+        document.addEventListener('keyup', this.boundOnKeyUp);
     }
     
     onDestroy() {
-        document.removeEventListener('mousemove', this.onMouseMove.bind(this));
-        document.removeEventListener('keydown', this.onKeyDown.bind(this));
-        document.removeEventListener('keyup', this.onKeyUp.bind(this));
+        document.removeEventListener('mousemove', this.boundOnMouseMove);
+        document.removeEventListener('keydown', this.boundOnKeyDown);
+        document.removeEventListener('keyup', this.boundOnKeyUp);
     }
 
     update(deltaTime) {

@@ -59,11 +59,24 @@ export class Gun {
 
     start() {
         this.ammo = this.maxAmmo;
-        document.addEventListener("mousedown", this.onMouseDown.bind(this));
-        document.addEventListener("mouseup", this.onMouseUp.bind(this));
-        document.addEventListener('keydown', this.onKeyDown.bind(this));
-        document.addEventListener('keyup', this.onKeyUp.bind(this));
+        this.boundOnMouseDown = this.onMouseDown.bind(this);
+        this.boundOnMouseUp = this.onMouseUp.bind(this);
+        this.boundOnKeyDown = this.onKeyDown.bind(this);
+        this.boundOnKeyUp = this.onKeyUp.bind(this);
+
+        document.addEventListener("mousedown", this.boundOnMouseDown);
+        document.addEventListener("mouseup", this.boundOnMouseUp);
+        document.addEventListener('keydown', this.boundOnKeyDown);
+        document.addEventListener('keyup', this.boundOnKeyUp);
     }
+
+    onDestroy() {
+        document.removeEventListener("mousedown", this.boundOnMouseDown);
+        document.removeEventListener("mouseup", this.boundOnMouseUp);
+        document.removeEventListener("keydown", this.boundOnKeyDown);
+        document.removeEventListener("keyup", this.boundOnKeyUp);
+    }
+
 
     onKeyDown(event) {
         if (event.key == "r" && !this.reloading) {
@@ -78,19 +91,19 @@ export class Gun {
     }
     onMouseDown(event) {
         if (event.button != 0) return;
-        if(!this.singleshot){
+        if (!this.singleshot) {
             this.shooting = true;
         }
-        else{
+        else {
             this.shooting = true;
-            setTimeout(()=>{
+            setTimeout(() => {
                 this.shooting = false;
             }, this.fireRate);
         }
     }
     onMouseUp(event) {
         if (event.button != 0) return;
-        if(!this.singleshot){
+        if (!this.singleshot) {
             this.shooting = false;
         }
     }
@@ -198,7 +211,7 @@ export class Gun {
                 }
             }
 
-            const offset = this.offset.clone().add(new THREE.Vector3(this.bobx, this.boby +  this.reloadOffset));
+            const offset = this.offset.clone().add(new THREE.Vector3(this.bobx, this.boby + this.reloadOffset));
             offset.applyQuaternion(this.engine.camera.quaternion.clone());
             gunPos = gunPos.add(offset);
 
