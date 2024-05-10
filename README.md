@@ -6,6 +6,13 @@ A threejs based game engine
 
 2) Clone or download the zip
 
-3) Install packages in directory with `npm i` in the BracketEngine folder
+4) Run `start.bat`
 
-4) Run `npm start`
+
+# Programming
+
+To modify the example project installed by default, modify `program.js`.
+
+For engine functions, reference `engine.js`
+
+UI can be modified in the `UI` folder
