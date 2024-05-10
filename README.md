@@ -16,3 +16,8 @@ To modify the example project installed by default, modify `program.js`.
 For engine functions, reference `engine.js`
 
 UI can be modified in the `UI` folder
+
+
+# Useful Resources
+Three JS: https://threejs.org/docs/
+Cannon-es Physics Engine: https://pmndrs.github.io/cannon-es/docs/index.html
