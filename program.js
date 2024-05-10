@@ -107,6 +107,7 @@ export class Program {
         capsuleObject.setPosition(position.x, position.y, position.z);
         const capsuleShape = new CANNON.Cylinder(1, 1, 4, 16);
         capsuleObject.initPhysicsBody(this.engine.physicsWorld, capsuleShape, 0, 0, 70);
+        capsuleObject.physicsBody.mass = 500;
         capsuleObject.physicsBody.collisionFilterGroup = 2;
         this.engine.csm.setupMaterial(capsuleMaterial);
 

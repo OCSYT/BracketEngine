@@ -22,7 +22,7 @@ export class PlayerControls {
         this.rotY = 0;
         this.grounded = false;
 
-        this.jumpSpeed = 300;
+        this.jumpSpeed = 1000;
         this.canJump = true;
 
         this.prevVel = new CANNON.Vec3();
