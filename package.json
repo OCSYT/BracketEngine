@@ -5,17 +5,17 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder"
+    "dist-win": "electron-packager . engine --platform=win32 --arch=x64 --out=./dist --overwrite"
   },
   "author": "Bracket",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^29.1.4",
-    "electron-builder": "^24.13.3"
+    "electron": "^29.1.4"
   },
   "dependencies": {
     "cannon-es": "^0.20.0",
     "cannon-es-debugger": "^1.0.0",
+    "electron-packager": "^17.1.2",
     "i": "^0.3.7",
     "npm": "^10.5.0",
     "three": "^0.162.0"
