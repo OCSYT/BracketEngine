@@ -1,5 +1,5 @@
 # BracketEngine
-A threejs based game engine
+A Three.js based game engine
 ![image](https://github.com/OCSYT/BracketEngine/assets/69521768/b8aca42f-236c-4b35-8d1a-edcf77841179)
 
 
@@ -25,6 +25,6 @@ UI can be modified in the `UI` folder
 
 
 # Useful Resources
-Three JS: https://threejs.org/docs/
+Three.js: https://threejs.org/docs/
 
 Cannon-es Physics Engine: https://pmndrs.github.io/cannon-es/docs/index.html
