@@ -17,6 +17,10 @@ For engine functions, reference `engine.js`
 
 UI can be modified in the `UI` folder
 
+# Build Instructions
+## Windows
+1) Run `npm run dist-win`
+
 
 # Useful Resources
 Three JS: https://threejs.org/docs/
