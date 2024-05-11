@@ -62,7 +62,6 @@ export class Gun {
         this.boundOnMouseDown = this.onMouseDown.bind(this);
         this.boundOnMouseUp = this.onMouseUp.bind(this);
         this.boundOnKeyDown = this.onKeyDown.bind(this);
-        this.boundOnKeyUp = this.onKeyUp.bind(this);
 
         document.addEventListener("mousedown", this.boundOnMouseDown);
         document.addEventListener("mouseup", this.boundOnMouseUp);
