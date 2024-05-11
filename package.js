@@ -12,7 +12,8 @@ const packagerOptions = {
   asar: false,
   afterCopy: [
     cleanSources
-  ]
+  ],
+  icon: 'icon.ico'
 };
 
 packager(packagerOptions).then(outPath => {
