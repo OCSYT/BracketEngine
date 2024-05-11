@@ -11,7 +11,7 @@ A threejs based game engine
 
 # Programming
 
-To modify the example project installed by default, modify `program.js`.
+Main game loop logic is found in `program.js`.
 
 For engine functions, reference `engine.js`
 
