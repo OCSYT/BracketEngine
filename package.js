@@ -9,7 +9,7 @@ const packagerOptions = {
   out: 'dist',
   platform: 'win32',
   overwrite: true,
-  asar: false,
+  asar: true,
   afterCopy: [
     cleanSources
   ],
