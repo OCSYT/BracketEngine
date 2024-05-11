@@ -67,14 +67,12 @@ export class Gun {
         document.addEventListener("mousedown", this.boundOnMouseDown);
         document.addEventListener("mouseup", this.boundOnMouseUp);
         document.addEventListener('keydown', this.boundOnKeyDown);
-        document.addEventListener('keyup', this.boundOnKeyUp);
     }
 
     onDestroy() {
         document.removeEventListener("mousedown", this.boundOnMouseDown);
         document.removeEventListener("mouseup", this.boundOnMouseUp);
         document.removeEventListener("keydown", this.boundOnKeyDown);
-        document.removeEventListener("keyup", this.boundOnKeyUp);
     }
 
 
@@ -86,9 +84,7 @@ export class Gun {
             }, this.reloadRate);
         }
     }
-    onKeyUp(event) {
 
-    }
     onMouseDown(event) {
         if (event.button != 0) return;
         if (!this.singleshot) {
