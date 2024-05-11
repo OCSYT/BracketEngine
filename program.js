@@ -141,6 +141,8 @@ export class Program {
         this.engine.csm = csm;
     }
 
+
+
     setupScene() {
         //skybox
         const loader = new THREE.CubeTextureLoader();
@@ -190,7 +192,6 @@ export class Program {
         bloomPass.strength = .25;
         bloomPass.radius = 0;
         this.engine.composer.addPass(bloomPass);
-
 
         //pass
         this.engine.composer.addPass(new OutputPass());
