@@ -202,7 +202,8 @@ export class Gun {
                 }
                 else {
                     this.bobx = THREE.MathUtils.lerp(this.bobx, 0, 5 * 0.02);
-                    this.boby = THREE.MathUtils.lerp(this.boby, 0, 5 * 0.02);
+                    this.boby = THREE.MathUtils.lerp(this.boby, THREE.MathUtils.clamp
+                        (this.player.body.velocity.y / 500, -1, 1), 5 * 0.02);
                 }
             }
 
