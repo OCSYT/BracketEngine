@@ -1,5 +1,4 @@
 const { app, BrowserWindow, screen, remote, ipcMain, Menu, globalShortcut } = require('electron');
-const path = require('path');
 
 
 

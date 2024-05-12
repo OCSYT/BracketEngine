@@ -17,15 +17,12 @@ export class Engine {
         this.frameCount = 0;
         this.currentFPS = 0;
         this.physicsWorld = new CANNON.World({
-            gravity: new CANNON.Vec3(0, -9.82, 0) // m/s²
+            gravity: new CANNON.Vec3(0, -9.82, 0)
         });
         this.clock = new THREE.Clock();
         this.composer = new EffectComposer(this.renderer);
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(this.renderer.domElement);
-
-
-
     }
 
     getGameObjectByBody(physicsBody) {
@@ -67,9 +64,9 @@ export class Engine {
             this.program.fixedUpdate();
         }, 1000 / 60);
     }
-    fixedUpdate() {
 
-        
+
+    fixedUpdate() {
         this.gameObjects.forEach(gameObject => {
             gameObject.fixedUpdate();
         });
@@ -77,8 +74,6 @@ export class Engine {
         if (this.physicsWorld == null) return;
 
         this.physicsWorld.step(1/60);
-
-
     }
 
 
@@ -217,6 +212,10 @@ export class Engine {
 
 
 }
+
+
+
+//Main Components
 
 export class GameObject {
     constructor() {
