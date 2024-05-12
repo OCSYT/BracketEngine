@@ -160,7 +160,7 @@ export class Program {
         this.engine.renderer.toneMapping = THREE.ACESFilmicToneMapping;
         this.engine.renderer.toneMappingExposure = 1.3;
 
-
+        //ambient occlusion
         const AO = new GTAOPass(this.engine.scene, this.engine.camera, window.innerWidth, window.innerHeight);
 
         this.engine.composer.addPass(AO);
