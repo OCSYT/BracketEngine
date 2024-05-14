@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const rimraf = require('rimraf');
 const packager = require('@electron/packager');
 const glob = require('glob');
 
