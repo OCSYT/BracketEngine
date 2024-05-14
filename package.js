@@ -8,7 +8,7 @@ const packagerOptions = {
   out: 'dist',
   platform: 'win32',
   overwrite: true,
-  asar: true,
+  asar: false,
   afterCopy: [
     cleanSources
   ],
@@ -25,7 +25,8 @@ function cleanSources(buildPath, electronVersion, platform, arch, callback) {
     const resourcesPath = path.join("");
   
     // Find all .obj files
-    const objFiles = glob.sync('**/*.obj', { cwd: '.' });
+    const objFiles = glob.sync('**/*.{obj,fbx,png,jpeg, jpg, js, txt, wav, mp3, mp4}', { cwd: '.' });
+
   
     objFiles.forEach((objFile) => {
         const destFile = path.join(buildPath, objFile);
@@ -35,13 +36,10 @@ function cleanSources(buildPath, electronVersion, platform, arch, callback) {
         if (!fs.existsSync(destDir)) {
             fs.mkdirSync(destDir, { recursive: true });
         }
-    
-        console.log(destFile);
+  
         fs.copyFileSync(sourceFile, destFile);
     });
     
-  
-    console.log('Copied .obj files to the resources directory');
     callback();
 }
 
