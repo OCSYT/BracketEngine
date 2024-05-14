@@ -84,7 +84,6 @@ export class Engine {
     update() {
         if (!this.isRunning) return;
 
-        const currentTime = performance.now();
 
         const deltaTime = this.clock.getDelta();
         this.calculateFPS(deltaTime);
