@@ -83,10 +83,8 @@ export class Engine {
 
 
 
-<<<<<<< Updated upstream
-=======
     async update() {
->>>>>>> Stashed changes
+
 
         
         const currentTime = Date.now();
