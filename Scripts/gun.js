@@ -163,7 +163,7 @@ export class Gun {
 
 
 
-    fixedUpdate() {
+    async fixedUpdate() {
 
         document.getElementById("guninfo").innerHTML =
             this.gunName + ": " +

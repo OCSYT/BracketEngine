@@ -8,12 +8,13 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 
 export class Engine {
     constructor() {
+        this.FrameRateLimit = -1;
+        this.lastFrameTime = 0;
         this.scene = new THREE.Scene();
         this.camera = null;
         this.csm = null;
         this.renderer = new THREE.WebGLRenderer();
         this.gameObjects = [];
-        this.isRunning = false;
         this.frameCount = 0;
         this.currentFPS = 0;
         this.physicsWorld = new CANNON.World({
@@ -56,20 +57,23 @@ export class Engine {
         composer.passes.unshift(removedPass);
     }
 
-    start() {
-        this.isRunning = true;
-        this.update();
-        setInterval(() => {
-            this.fixedUpdate();
-            this.program.fixedUpdate();
+    async start() {
+        setInterval(async () => {
+            await this.fixedUpdate();
+            await this.program.fixedUpdate();
         }, 1000 / 60);
+
+
+        setInterval(async () => {
+            await this.update();
+        }, 1000 / this.FrameRateLimit);
     }
 
 
-    fixedUpdate() {
-        this.gameObjects.forEach(gameObject => {
-            gameObject.fixedUpdate();
-        });
+
+    async fixedUpdate() {
+        const updatePromises = this.gameObjects.map(gameObject => gameObject.fixedUpdate());
+        await Promise.all(updatePromises);
 
         if (this.physicsWorld == null) return;
 
@@ -77,15 +81,17 @@ export class Engine {
     }
 
 
-    stop() {
-        this.isRunning = false;
-    }
-
-    update() {
-        if (!this.isRunning) return;
 
 
-        const deltaTime = this.clock.getDelta();
+<<<<<<< Updated upstream
+=======
+    async update() {
+>>>>>>> Stashed changes
+
+        
+        const currentTime = Date.now();
+        const deltaTime = (currentTime - this.lastFrameTime) / 1000;
+        this.lastFrameTime = currentTime;
         this.calculateFPS(deltaTime);
 
         if (this.camera) {
@@ -100,13 +106,11 @@ export class Engine {
 
 
         // Update game logic here
-        this.gameObjects.forEach(gameObject => {
-            gameObject.update(deltaTime);
-        });
-
+        const updatePromises = this.gameObjects.map(gameObject => gameObject.update(deltaTime));
+        await Promise.all(updatePromises);
+    
+        await this.program.update(deltaTime);
         this.renderScene();
-        this.program.update(deltaTime);
-        requestAnimationFrame(() => this.update());
     }
 
 
@@ -375,25 +379,26 @@ export class GameObject {
         }
     }
 
-    update(deltaTime) {
-        this.components.forEach(component => {
-
-            if (component.update) {
-                component.update(deltaTime);
-            }
-
-        });
+    async update(deltaTime) {
         this.updatePhysics(deltaTime);
-    }
-
-    fixedUpdate() {
-        this.components.forEach(component => {
-            if (component.fixedUpdate) {
-                component.fixedUpdate();
+        const promises = this.components.map(async (component) => {
+            if (component.update) {
+                return component.update(deltaTime);
             }
-
         });
+    
+        await Promise.all(promises);
     }
+
+    async fixedUpdate() {
+        const promises = this.components.map(async (component) => {
+            if (component.fixedUpdate) {
+                return component.fixedUpdate();
+            }
+        });
+        await Promise.all(promises);
+    }
+    
 
 
 

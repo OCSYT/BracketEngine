@@ -38,7 +38,7 @@ export class PlayerControls {
         clearTimeout(this.timer);
         this.timer = setTimeout(() => {
             this.mouseStopped = true;
-        }, 10);
+        }, 1);
     }
 
     onKeyDown(event) {
@@ -105,9 +105,9 @@ export class PlayerControls {
         document.removeEventListener('keyup', this.boundOnKeyUp);
     }
 
-    update(deltaTime) {
+    async update(deltaTime) {
         if(this.engine.camera == null) return;
-        const sensitivity = this.sensitivity / 10 * deltaTime;
+        const sensitivity = (this.sensitivity / 1) * deltaTime;
         const deltaX = this.mouseX * sensitivity;
         const deltaY = this.mouseY * sensitivity;
 
@@ -121,7 +121,7 @@ export class PlayerControls {
         }
     }
 
-    fixedUpdate() {
+    async fixedUpdate() {
 
         if(this.engine.camera == null) return;
         const moveDirection = new THREE.Vector3();

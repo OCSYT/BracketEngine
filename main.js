@@ -9,7 +9,7 @@ function createWindow() {
     autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: true,
-      backgroundThrottling: false
+      backgroundThrottling: false,
     }
   });
 
@@ -47,3 +47,4 @@ function createWindow() {
 }
 
 app.whenReady().then(createWindow);
+app.commandLine.appendSwitch('disable-frame-rate-limit');
